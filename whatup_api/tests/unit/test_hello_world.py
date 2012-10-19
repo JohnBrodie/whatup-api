@@ -11,8 +11,8 @@ class HelloWorldTestCase(TestCase):
 
     def should_return_hello(self):
         resp = self.app.get('/')
-        assert 'Hello World!' in resp.data
+        self.assertEquals('Hello World!', resp.data)
 
     def should_return_200_OK(self):
-	resp = self.app.get('/')
-	assert resp.status_code == OK
+        resp = self.app.get('/')
+        self.assertEquals(OK, resp.status_code)
