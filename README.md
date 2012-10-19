@@ -8,6 +8,7 @@ Developing
 ==========
 
 1.  `apt-get install python-vritualenv`
+1.  Make sure python-dev package is installed `apt-get install python2.7-dev`
 1.  Clone this repo
 1.  cd into whatup-api
 1.  `./virtualenv.sh`
