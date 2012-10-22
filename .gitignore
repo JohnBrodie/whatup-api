@@ -32,3 +32,11 @@ lib
 include
 local
 man
+
+# vim
+*.swp
+*.swn
+*.swo
+
+# sqlite db
+*.db
