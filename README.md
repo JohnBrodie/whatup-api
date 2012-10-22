@@ -22,6 +22,12 @@ If you do, you are ready to go.
 Testing
 =======
 
+For now, we must patch Flask-SQLAlchemy to work with our fixtures:
+https://github.com/jpanganiban/flask-sqlalchemy/commit/2257c41c6c36551f212bd02e3ff5104b748f7d4b
+
+Add those lines in lib/python2.7/site-packages/flask_sqlalchemy.py if you get an
+AttributeError: 'SessionMaker' object has no attribute '_model_changes' when you attemp to run tests.
+
 We will use nose to run tests, and mock for mocking.
 Mock docs: http://www.voidspace.org.uk/python/mock/
 
