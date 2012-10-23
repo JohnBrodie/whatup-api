@@ -17,5 +17,5 @@ def create_tables(app):
     db.metadata.create_all(engine)
     return engine
 
-from whatup_api.models.egg import Egg
-from whatup_api.models.spam import Spam
+from whatup_api.models.user import User
+from whatup_api.models.tag import Tag
