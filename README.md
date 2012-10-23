@@ -7,6 +7,9 @@ Project WhatUp Core API
 Developing
 ==========
 
+1.  Setup mysql-server:
+    * apt-get install mysql-server libmysqlclient-dev
+    * root user should have password 'whatup' (without quotes)
 1.  `apt-get install python-vritualenv`
 1.  Make sure python-dev package is installed `apt-get install python2.7-dev`
 1.  Clone this repo

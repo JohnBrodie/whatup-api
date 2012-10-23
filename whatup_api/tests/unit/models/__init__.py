@@ -9,7 +9,8 @@ import whatup_api.tests.fixtures as fixtures
 
 class ModelTestCase(TestCase):
 
-    db_uri = 'sqlite:///' + os.path.abspath('../../tests.db')
+    #db_uri = 'sqlite:///' + os.path.abspath('../../tests.db')
+    db_uri = 'mysql://root:whatup@localhost/tests'
 
     def create_app(self):
         app = Flask(__name__)
