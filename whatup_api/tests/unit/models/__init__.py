@@ -20,6 +20,7 @@ class ModelTestCase(TestCase):
         self.db = m.init_app(self.app)
         self.tag_data = self.data.TagData
         self.user_data = self.data.UserData
+        self.post_data = self.data.PostData
 
     def tearDown(self):
         self.db.session.remove()

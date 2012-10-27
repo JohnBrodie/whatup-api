@@ -15,4 +15,5 @@ def install(app, *args):
 # A simple trick for installing all fixtures from an external module.
 from whatup_api.tests.fixtures.user_data import UserData
 from whatup_api.tests.fixtures.tag_data import TagData
-all_data = (UserData, TagData,)
+from whatup_api.tests.fixtures.post_data import PostData
+all_data = (UserData, TagData, PostData,)
