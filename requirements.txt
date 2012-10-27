@@ -11,6 +11,8 @@ argparse==1.2.1
 coverage==3.5.3
 distribute==0.6.28
 fixture==1.4
+gevent==0.13.8
+greenlet==0.4.0
 mock==1.0.0
 nose==1.2.1
 python-dateutil==1.5
