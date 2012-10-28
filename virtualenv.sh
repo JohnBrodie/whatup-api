@@ -7,3 +7,4 @@ pip install --upgrade distribute
 pip install -r requirements.txt;
 patch lib/python2.7/site-packages/flask_sqlalchemy.py < patch_flask_sqlA.patch
 nosetests -x
+python whatup_api/app.py &
