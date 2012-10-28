@@ -1,0 +1,11 @@
+--- lib/python2.7/site-packages/flask_sqlalchemy.py	2012-10-28 15:26:25.785666762 -0400
++++ patched_sql.py	2012-10-28 15:26:20.445666862 -0400
+@@ -167,6 +167,8 @@
+ 
+     def _record(self, mapper, model, operation):
+         pk = tuple(mapper.primary_key_from_instance(model))
++        if not hasattr(orm.object_session(model), '_model_changes'):
++            orm.object_session(model)._model_changes = dict()
+         orm.object_session(model)._model_changes[pk] = (model, operation)
+         return EXT_CONTINUE
+ 
