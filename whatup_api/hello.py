@@ -3,6 +3,7 @@ import config
 import logging
 import logging.config
 
+from ConfigParser import NoSectionError
 from os import environ
 
 from flask import Flask
@@ -19,8 +20,13 @@ env_var = environ.get('WHATUPCONFIG')
 if env_var:
     app.config.from_envvar('WHATUPCONFIG')
 
-# Set up logging
-logging.config.fileConfig('setup.cfg')
+# Set up logging, tests and running app
+# have different paths.
+try:
+    logging.config.fileConfig('setup.cfg')
+except NoSectionError:
+    logging.config.fileConfig('../../setup.cfg')
+
 log = logging.getLogger('whatupAPI')
 app.logger.addHandler(log)
 
