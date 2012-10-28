@@ -20,7 +20,7 @@ if env_var:
     app.config.from_envvar('WHATUPCONFIG')
 
 # Set up logging
-logging.config.fileConfig('../../setup.cfg')
+logging.config.fileConfig('setup.cfg')
 log = logging.getLogger('whatupAPI')
 app.logger.addHandler(log)
 
