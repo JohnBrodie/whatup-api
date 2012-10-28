@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mysql -uroot -pwhatup -e "create database tests";
+mysql -uroot -pwhatup -e "drop database tests; create database tests";
 virtualenv --distribute .;
 source bin/activate;
 pip install --upgrade distribute
