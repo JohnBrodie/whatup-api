@@ -4,7 +4,6 @@ from whatup_api.hello import app
 import whatup_api.tests.fixtures.fixtures as _fixtures
 import whatup_api.models.models as m
 
-
 manager = Manager(app)
 
 
