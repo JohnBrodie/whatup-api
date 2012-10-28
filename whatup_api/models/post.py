@@ -15,7 +15,6 @@ class Post(db.Model):
     topic = db.Column(db.String(1000))
     body = db.Column(db.String(1000))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    author = db.relationship('User')
     # TODO TAGS
     # TODO REFERENCES
     # TODO ATTACHMENTS

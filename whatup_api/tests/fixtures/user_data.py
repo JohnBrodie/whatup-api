@@ -10,6 +10,3 @@ class UserData(DataSet):
         modified_at = datetime(2001, 10, 11)
         name = 'Joe Smith'
         bio = 'A little bit country'
-        #subscriptions = SubscriptionData.default
-        #tags_created = TagsCreatedData.default
-        #tags_used = TagsUsedData.default

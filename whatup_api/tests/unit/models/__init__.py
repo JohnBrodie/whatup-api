@@ -21,6 +21,7 @@ class ModelTestCase(TestCase):
         self.tag_data = self.data.TagData
         self.user_data = self.data.UserData
         self.post_data = self.data.PostData
+        self.subscription_data = self.data.SubscriptionData
 
     def tearDown(self):
         self.db.session.remove()

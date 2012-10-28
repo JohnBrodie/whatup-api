@@ -11,5 +11,4 @@ class TagData(DataSet):
         created_at = datetime(2001, 10, 10)
         modified_at = datetime(2001, 10, 11)
         author = UserData.default
-        user_id = UserData.default.ref('id')
         summary = 'summary goes here'

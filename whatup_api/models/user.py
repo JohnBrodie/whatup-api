@@ -13,9 +13,9 @@ class User(db.Model):
     modified_at = db.Column(db.DateTime)
     name = db.Column(db.String(100))
     bio = db.Column(db.String(255))
-    #subscriptions = db.relationship('Subscriptions',
-    #    backref='user', lazy='dynamic')
-    #tags_created = db.relationship('TagsCreated',
-    #    backref='user', lazy='dynamic')
-    #tags_used = db.relationship('TagsUsed',
-    #    backref='user', lazy='dynamic')
+    subscriptions = db.relationship('Subscription',
+        backref='owner', lazy='dynamic')
+    tags_created = db.relationship('Tag',
+        backref='author', lazy='dynamic')
+    posts = db.relationship('Post',
+        backref='author', lazy='dynamic')
