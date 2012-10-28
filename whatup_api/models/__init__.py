@@ -12,7 +12,7 @@ def init_app(app):
 
 
 def create_tables(app):
-    "Create tables, and return engine in case of further processing."
+    """Create tables, and return engine in case of further processing."""
     engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     db.metadata.create_all(engine)
     return engine
