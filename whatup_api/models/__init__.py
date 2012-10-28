@@ -17,5 +17,9 @@ def create_tables(app):
     db.metadata.create_all(engine)
     return engine
 
-from whatup_api.models.egg import Egg
-from whatup_api.models.spam import Spam
+# These are required, even though pylint will say
+# otherwise.
+from whatup_api.models.user import User
+from whatup_api.models.tag import Tag
+from whatup_api.models.post import Post
+from whatup_api.models.subscription import Subscription

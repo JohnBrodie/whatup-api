@@ -1,12 +1,20 @@
 """Hello world example"""
-from flask import Flask
-
 import config
-import whatup_api.models as m
+
+from flask import Flask
+from flask.ext.restless import APIManager
+
+from whatup_api import models as m
 
 app = Flask(__name__)
 app.config.from_object(config)
 db = m.init_app(app)
+
+manager = APIManager(app, flask_sqlalchemy_db=db)
+
+manager.create_api(m.Post, methods=['GET', 'POST'])
+manager.create_api(m.User, methods=['GET', 'POST'])
+
 
 @app.route('/')
 def hello_world():
