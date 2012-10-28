@@ -5,3 +5,4 @@ virtualenv --distribute .;
 source bin/activate;
 pip install --upgrade distribute
 pip install -r requirements.txt;
+nosetests -x
