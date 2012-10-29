@@ -1,3 +1,4 @@
+import datetime
 from flask import Flask
 from flask.ext.testing import TestCase
 
@@ -26,3 +27,7 @@ class ModelTestCase(TestCase):
     def tearDown(self):
         self.db.session.remove()
         self.db.drop_all()
+
+    def compare_time(self, value):
+        expected = datetime.datetime.now()
+        return abs(value - expected) < datetime.timedelta(minutes=1)

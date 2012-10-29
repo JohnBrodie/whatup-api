@@ -7,9 +7,9 @@ from whatup_api.tests.fixtures.user_data import UserData
 
 class PostData(DataSet):
 
-    class default:
+    class Default:
         created_at = datetime(2001, 10, 10)
         modified_at = datetime(2001, 10, 11)
-        author = UserData.default
+        author = UserData.Default
         topic = 'topic goes here'
         body = 'body goes here'
