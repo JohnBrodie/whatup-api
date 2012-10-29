@@ -13,13 +13,6 @@ from whatup_api import models as m
 
 app = Flask(__name__)
 
-# Load config, overwrite config with values from file
-# specified as env var, if set.
-app.config.from_object(config)
-env_var = environ.get('WHATUPCONFIG')
-if env_var:
-    app.config.from_envvar('WHATUPCONFIG')
-
 # Set up logging, tests and running app
 # have different paths.
 try:
@@ -29,6 +22,15 @@ except NoSectionError:
 
 log = logging.getLogger('whatupAPI')
 app.logger.addHandler(log)
+
+# Load config, overwrite config with values from file
+# specified as env var, if set.
+app.config.from_object(config)
+env_var = environ.get('WHATUPCONFIG')
+if env_var:
+    app.logger.info('Using production config')
+    app.config.from_envvar('WHATUPCONFIG')
+
 
 db = m.init_app(app)
 
