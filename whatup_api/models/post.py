@@ -2,6 +2,10 @@
 
 from whatup_api.models import db
 
+postTags = db.Table('posttags', db.metadata,
+    db.Column('post', db.Integer, db.ForeignKey('posts.id')),
+    db.Column('tag', db.Integer, db.ForeignKey('tags.id'))
+)
 
 class Post(db.Model):
     """Post model"""
@@ -15,6 +19,8 @@ class Post(db.Model):
     topic = db.Column(db.String(1000))
     body = db.Column(db.String(1000))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    tags = db.relationship("Tag",
+        secondary=postTags, lazy='dynamic')
     # TODO TAGS
     # TODO REFERENCES
     # TODO ATTACHMENTS
