@@ -4,6 +4,8 @@ import whatup_api.models as m
 from whatup_api.tests.unit.models import ModelTestCase
 
 
+
+
 class SubscriptionModelTestCase(ModelTestCase):
     """Tests for Subscription model"""
 
@@ -28,3 +30,7 @@ class SubscriptionModelTestCase(ModelTestCase):
 
     def should_have_user(self):
         self.assertEquals(self.subscription.owner.id, self.user_data.default.id)
+    
+    def should_be_able_to_add_tag(self):
+        self.subscription.tag_names.append('test-tag')
+        self.assertEquals(self.subscription.tag_names[0], 'test-tag')

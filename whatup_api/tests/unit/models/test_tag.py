@@ -31,3 +31,6 @@ class TagModelTestCase(ModelTestCase):
 
     def should_have_author(self):
         self.assertEquals(self.tag.author.id, self.user_data.default.id)
+
+    def should_have_name(self):
+        self.assertEquals(self.tag.name, self.tag_data.default.name)
