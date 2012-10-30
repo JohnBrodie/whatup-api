@@ -7,8 +7,7 @@ from whatup_api.tests.fixtures.user_data import UserData
 
 class SubscriptionData(DataSet):
 
-    class default:
+    class Default:
         created_at = datetime(2001, 10, 10)
         modified_at = datetime(2001, 10, 11)
-        owner = UserData.default
-        
+        owner = UserData.Default
