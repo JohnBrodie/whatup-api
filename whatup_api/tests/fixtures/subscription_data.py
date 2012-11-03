@@ -11,3 +11,8 @@ class SubscriptionData(DataSet):
         created_at = datetime(2001, 10, 10)
         modified_at = datetime(2001, 10, 11)
         owner = UserData.Default
+
+    class Other:
+        created_at = datetime(2001, 10, 10)
+        modified_at = datetime(2001, 10, 11)
+        owner = UserData.Default
