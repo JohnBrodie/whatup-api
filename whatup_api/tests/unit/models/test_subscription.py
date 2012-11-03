@@ -1,5 +1,6 @@
 """Test case for Subscription model"""
 import whatup_api.models as m
+from sqlalchemy.exc import IntegrityError
 
 from whatup_api.tests.unit.models import ModelTestCase
 
@@ -36,3 +37,8 @@ class SubscriptionModelTestCase(ModelTestCase):
     def should_be_able_to_add_tag(self):
         self.subscription.tag_names.append('test-tag')
         self.assertEquals(self.subscription.tag_names[0], 'test-tag')
+
+    def should_not_be_able_to_add_duplicate_tag(self):
+        self.subscription.tag_names.append('test-tag')
+        self.subscription.tag_names.append('test-tag')
+        self.assertRaisesRegexp(IntegrityError, r'1062', self.db.session.commit) # 1062 = mysql duplicate entry error code
