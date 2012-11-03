@@ -13,4 +13,3 @@ class UserData(DataSet):
 
     class SpecifiesNone:
         name = 'John Doe'
-        bio = 'A little bit rock and roll'
