@@ -12,7 +12,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     modified_at = db.Column(db.DateTime, default=func.now(), nullable=False)
-    name = db.Column(db.String(100))
+    name = db.Column(db.String(255), nullable=False)
     bio = db.Column(db.String(255))
     subscriptions = db.relationship('Subscription', backref='owner',
                                     lazy='dynamic')
