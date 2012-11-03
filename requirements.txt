@@ -16,6 +16,7 @@ gevent==0.13.8
 greenlet==0.4.0
 mock==1.0.0
 nose==1.2.1
+nosy==1.1.2
 python-dateutil==1.5
 python-termstyle==0.1.10
 rednose==0.3.3
