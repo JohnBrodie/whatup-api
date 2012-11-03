@@ -38,3 +38,10 @@ class UserModelTestCase(ModelTestCase):
 
     def should_have_bio(self):
         self.assertEquals(self.user.bio, self.user_data.Default.bio)
+
+    def should_have_subscriptions(self):
+        subscriptions = self.user.subscriptions.all()
+        self.assertEquals(len(subscriptions), 2)
+
+        for sub in subscriptions:
+            self.assertEqual(sub.owner.id, self.user.id)
