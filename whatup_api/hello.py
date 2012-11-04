@@ -11,7 +11,7 @@ from flask.ext.restless import APIManager
 
 from whatup_api import models as m
 
-app = Flask(__name__)
+app = Flask('whatup_api')
 
 # Set up logging, tests and running app
 # have different paths.
