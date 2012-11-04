@@ -38,6 +38,8 @@ manager = APIManager(app, flask_sqlalchemy_db=db)
 
 manager.create_api(m.Post, methods=['GET', 'POST'])
 manager.create_api(m.User, methods=['GET', 'POST'])
+manager.create_api(m.Tag, methods=['GET', 'POST'])
+manager.create_api(m.Subscription, methods=['GET', 'POST'])
 
 
 @app.route('/')
