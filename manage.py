@@ -1,8 +1,8 @@
 from flask.ext.script import Manager
 
 from whatup_api.hello import app
-import whatup_api.tests.fixtures.fixtures as _fixtures
-import whatup_api.models.models as m
+import whatup_api.tests.fixtures as _fixtures
+import whatup_api.models as m
 
 manager = Manager(app)
 
