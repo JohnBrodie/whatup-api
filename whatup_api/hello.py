@@ -36,10 +36,26 @@ db = m.init_app(app)
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
 
-manager.create_api(m.Post, methods=['GET', 'POST'])
-manager.create_api(m.User, methods=['GET', 'POST'])
-manager.create_api(m.Tag, methods=['GET', 'POST'])
-manager.create_api(m.Subscription, methods=['GET', 'POST'])
+manager.create_api(m.Post, methods=['GET', 'POST', 'PATCH', 'PUT', 'DELETE'])
+manager.create_api(m.User, methods=['GET', 'POST', 'PATCH', 'PUT'])
+manager.create_api(m.Tag, methods=['GET', 'POST', 'PATCH', 'PUT'])
+manager.create_api(m.Subscription, methods=['GET', 'POST', 'PATCH',
+                                            'PUT', 'DELETE'])
+
+
+# This function is called before every request.
+@app.before_request
+def before():
+    log.debug('Incoming request')
+
+
+# This function is called after every request,
+# so we can muck with the response here.
+@app.after_request
+def after(response):
+    log.debug('request complete')
+
+    return response
 
 
 @app.route('/')
