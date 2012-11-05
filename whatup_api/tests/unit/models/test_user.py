@@ -82,6 +82,20 @@ class DescribeNameColumn(UserModelTestCase):
     def should_have_non_nullable_name(self):
         self.assertFalse(self.is_nullable('name'))
 
+class DescribeAliasColumn(UserModelTestCase):
+
+    def should_have_alias(self):
+        self.assertEquals(self.user.alias, self.user_data.Default.alias)
+
+    def should_have_alias_as_string(self):
+        self.assertTrue(self.is_type('alias', self.db.String))
+
+    def should_have_alias_with_length(self):
+        self.assertEquals(self.get_length('alias'), 255)
+
+    def should_have_nullable_alias(self):
+        self.assertEquals(self.specifies_none.alias, None)
+
 
 class DescribeBioColumn(UserModelTestCase):
 
@@ -98,7 +112,7 @@ class DescribeBioColumn(UserModelTestCase):
         self.assertEquals(self.specifies_none.bio, None)
 
 
-class DescribeBioRelationship(UserModelTestCase):
+class DescribeSubscriptionRelationship(UserModelTestCase):
 
     def should_have_subscriptions(self):
         subscriptions = self.user.subscriptions.all()
@@ -139,7 +153,7 @@ class DescribePostRelationship(UserModelTestCase):
 
     def should_have_posts(self):
         posts = self.user.posts.all()
-        self.assertEquals(len(posts), 1)
+        self.assertEquals(len(posts), 2)
 
         for post in posts:
             self.assertEqual(post.author.id, self.user.id)
