@@ -153,7 +153,7 @@ class DescribePostRelationship(UserModelTestCase):
 
     def should_have_posts(self):
         posts = self.user.posts.all()
-        self.assertEquals(len(posts), 2)
+        self.assertEquals(len(posts), 1)
 
         for post in posts:
             self.assertEqual(post.author.id, self.user.id)
