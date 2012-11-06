@@ -1,6 +1,7 @@
 """Model for subscriptions"""
 
 from whatup_api.models import db
+from sqlalchemy.sql import func
 
 from sqlalchemy.ext.associationproxy import association_proxy
 
@@ -16,9 +17,9 @@ class Subscription(db.Model):
     __tablename__ = 'subscriptions'
 
     id = db.Column(db.Integer, primary_key=True)
-    created_at = db.Column(db.DateTime)
-    modified_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
+    modified_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    tags = db.relationship("Tag", secondary=lambda: subsTags)
-    users = db.relationship("User", secondary=lambda: subsTags)
+    tags = db.relationship("Tag", secondary=lambda: subsTags, lazy='dynamic')
+    users = db.relationship("User", secondary=lambda: subsTags, lazy='dynamic')
     tag_names = association_proxy('tags', 'name')

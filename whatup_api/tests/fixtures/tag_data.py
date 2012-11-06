@@ -12,3 +12,8 @@ class TagData(DataSet):
         modified_at = datetime(2001, 10, 11)
         author = UserData.Default
         summary = 'summary goes here'
+        name = 'defaulttagname'
+    
+    class SpecifiesNone:
+        author = UserData.Default
+        name = 'specifiesnonetagname'
