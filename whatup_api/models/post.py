@@ -1,6 +1,7 @@
 """Model for posts"""
 
 from whatup_api.models import db
+from sqlalchemy.sql import func
 
 from sqlalchemy.ext.associationproxy import association_proxy
 
@@ -17,12 +18,12 @@ class Post(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     rev_id = db.Column(db.Integer)
-    created_at = db.Column(db.DateTime)
-    modified_at = db.Column(db.DateTime)
-    topic = db.Column(db.String(1000))
-    body = db.Column(db.String(1000))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    tags = db.relationship("Tag", secondary=lambda: postTags)
+    created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
+    modified_at = db.Column(db.DateTime, default=func.now(), nullable=False)
+    topic = db.Column(db.String(1000), default='Untitled', nullable=False)
+    body = db.Column(db.String(1000), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    tags = db.relationship("Tag", secondary=lambda: postTags, lazy='dynamic')
     tag_names = association_proxy('tags', 'name')
     # TODO REFERENCES
     # TODO ATTACHMENTS

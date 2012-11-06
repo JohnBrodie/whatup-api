@@ -69,6 +69,9 @@ class ModelTestCase(TestCase):
     def has_backref(self, relation_name):
         return self.relations[relation_name].backref
 
+    def has_secondary(self, relation_name):
+        return self.relations[relation_name].secondary.name
+
     #  Note: target is the target model's table name
     def has_target(self, relation_name):
         return self.relations[relation_name].target.name

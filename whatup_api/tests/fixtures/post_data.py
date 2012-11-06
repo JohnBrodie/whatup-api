@@ -13,3 +13,7 @@ class PostData(DataSet):
         author = UserData.Default
         topic = 'topic goes here'
         body = 'body goes here'
+
+    class SpecifiesNone:
+        body = 'Tortoise, plaid, and Swedish meatballs.'
+        author = UserData.Default
