@@ -134,7 +134,7 @@ class DescribeSubscriptionRelationship(UserModelTestCase):
 class DescribeTagsCreatedRelationship(UserModelTestCase):
     def should_have_tags_created(self):
         tags = self.user.tags_created.all()
-        self.assertEquals(len(tags), 1)
+        self.assertEquals(len(tags), 2)
 
         for tag in tags:
             self.assertEqual(tag.author.id, self.user.id)
