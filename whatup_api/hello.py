@@ -54,6 +54,8 @@ def before():
 @app.after_request
 def after(response):
     log.debug('request complete')
+    response.headers.add('Access-Control-Allow-Origin',
+                         'http://*.projectwhatup.us')
 
     return response
 
