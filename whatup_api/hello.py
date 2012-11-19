@@ -55,6 +55,10 @@ def before():
 def after(response):
     log.debug('request complete')
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods',
+                         'POST, GET, PUT, PATCH, DELETE, OPTIONS')
+    response.headers.add('Access-Control-Allow-Headers',
+                         'Content-Type')
 
     return response
 
