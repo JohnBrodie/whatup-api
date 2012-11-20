@@ -54,11 +54,13 @@ def before():
 @app.after_request
 def after(response):
     log.debug('request complete')
+
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Methods',
                          'POST, GET, PUT, PATCH, DELETE, OPTIONS')
     response.headers.add('Access-Control-Allow-Headers',
                          'Content-Type')
+    response.headers.add('Access-Control-Max-Age', '1728000')
 
     return response
 
