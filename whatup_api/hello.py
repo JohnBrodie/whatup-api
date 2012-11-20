@@ -43,21 +43,32 @@ manager.create_api(m.Subscription, methods=['GET', 'POST', 'PATCH',
                                             'PUT', 'DELETE'])
 
 
-# This function is called before every request.
 @app.before_request
 def before():
-    # Hacky shit for cors
+    # TODO move this to middleware at the least,
+    # ideally, find a way to not need this!
     request.environ['CONTENT_TYPE'] = 'application/json'
+
+
+@app.before_request
+def log_request():
+    """ Log specifics about each request. """
+    # TODO log actual info
     log.debug('Incoming request')
 
 
-# This function is called after every request,
-# so we can muck with the response here.
 @app.after_request
-def after(response):
+def log_response(response):
+    """ Log that we are done the request. """
+    # TODO log actual info
     log.debug('request complete')
 
-    # more CORS hackness
+    return response
+
+
+def add_cors_headers(response):
+    """ This is needed atm for proper CORS support. """
+    # TODO figure out which are actually needed
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Methods',
                          'POST, GET, PUT, PATCH, DELETE, OPTIONS')
@@ -69,7 +80,8 @@ def after(response):
 
 
 @app.route('/')
-def hello_world():
+def root_message():
+    # TODO
     return 'Hello World!'
 
 if __name__ == '__main__':
