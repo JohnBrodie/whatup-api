@@ -6,7 +6,7 @@ import logging.config
 from ConfigParser import NoSectionError
 from os import environ
 
-from flask import Flask
+from flask import Flask, request
 from flask.ext.restless import APIManager
 
 from whatup_api import models as m
@@ -46,6 +46,8 @@ manager.create_api(m.Subscription, methods=['GET', 'POST', 'PATCH',
 # This function is called before every request.
 @app.before_request
 def before():
+    # Hacky shit for cors
+    request.environ['CONTENT_TYPE'] = 'application/json'
     log.debug('Incoming request')
 
 
@@ -55,6 +57,7 @@ def before():
 def after(response):
     log.debug('request complete')
 
+    # more CORS hackness
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Methods',
                          'POST, GET, PUT, PATCH, DELETE, OPTIONS')
