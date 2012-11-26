@@ -9,6 +9,7 @@ import logging.config
 
 from ConfigParser import NoSectionError
 from os import environ
+from sqlalchemy.exc import IntegrityError
 
 from flask import Flask
 from flask.ext.restless import APIManager
@@ -40,7 +41,8 @@ db = m.init_app(app)
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
 
-manager.create_api(m.Post, methods=['GET', 'POST', 'PATCH', 'PUT', 'DELETE'])
+manager.create_api(m.Post, methods=['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
+                   validation_exceptions=[IntegrityError])
 manager.create_api(m.User, methods=['GET', 'POST', 'PATCH', 'PUT'])
 manager.create_api(m.Tag, methods=['GET', 'POST', 'PATCH', 'PUT'])
 manager.create_api(m.Subscription, methods=['GET', 'POST', 'PATCH',
