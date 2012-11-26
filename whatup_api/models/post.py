@@ -3,8 +3,6 @@
 from whatup_api.models import db
 from sqlalchemy.sql import func
 
-from sqlalchemy.ext.associationproxy import association_proxy
-
 postTags = db.Table('posttags', db.metadata,
                     db.Column('post', db.Integer, db.ForeignKey('posts.id')),
                     db.Column('tag', db.Integer, db.ForeignKey('tags.id'))
@@ -24,6 +22,5 @@ class Post(db.Model):
     body = db.Column(db.String(1000), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     tags = db.relationship("Tag", secondary=lambda: postTags, lazy='dynamic')
-    tag_names = association_proxy('tags', 'name')
     # TODO REFERENCES
     # TODO ATTACHMENTS

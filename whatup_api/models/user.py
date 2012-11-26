@@ -16,6 +16,6 @@ class User(db.Model):
     alias = db.Column(db.String(255))
     bio = db.Column(db.String(255))
     subscriptions = db.relationship('Subscription', backref='owner',
-                                    lazy='dynamic')
+                                    lazy='dynamic', primaryjoin="User.id==Subscription.user_id")
     tags_created = db.relationship('Tag', backref='author', lazy='dynamic')
     posts = db.relationship('Post', backref='author', lazy='dynamic')

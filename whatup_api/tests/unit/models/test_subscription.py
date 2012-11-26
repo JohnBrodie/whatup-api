@@ -72,12 +72,26 @@ class DescribeUserIdColumn(SubscriptionModelTestCase):
     def should_have_user_id_as_integer(self):
         self.assertTrue(self.is_type('user_id', self.db.Integer))
 
+class DescribeUserColumn(SubscriptionModelTestCase):
+    def should_have_user(self):
+        self.assertEquals(self.subscription.user,
+                          self.subscription_data.Default.user)
+
+    def should_have_user_as_integer(self):
+        self.assertTrue(self.is_type('user', self.db.Integer))
+
+    def should_have_user_as_nullable(self):
+        self.assertTrue(self.is_nullable('user'))
 
 class DescribeOwnerRelationship(SubscriptionModelTestCase):
     def should_have_owner(self):
         owner = self.subscription.owner
         self.assertEqual(owner.id, self.user_data.Default.id)
 
+class DescribeSubscribeeRelationship(SubscriptionModelTestCase):
+    def should_have_subscribee(self):
+        subscribee = self.subscription.subscribee
+        self.assertEqual(subscribee.id, self.user_data.Default.id)
 
 class DescribeTagRelationship(SubscriptionModelTestCase):
     def should_have_tags(self):
@@ -93,37 +107,3 @@ class DescribeTagRelationship(SubscriptionModelTestCase):
 
     def should_have_tags_secondary_table(self):
         self.assertEquals(self.has_secondary('tags'), 'substags')
-
-
-class DescribeTagNamesAssociationProxy(SubscriptionModelTestCase):
-    def should_be_able_to_add_tag(self):
-        self.subscription.tag_names.append('test-tag1')
-        self.subscription.tag_names.append('test-tag2')
-        self.db.session.flush()
-        self.assertEquals(self.subscription.tag_names[0], 'test-tag1')
-        self.assertEquals(self.subscription.tag_names[1], 'test-tag2')
-
-
-class DescribeUsersRelationship(SubscriptionModelTestCase):
-    def should_have_users_relationship(self):
-        users = self.subscription.users.all()
-        for user in users:
-            self.assertEqual(user.id, self.user.id)
-
-    def should_have_users_relation_to_users_model(self):
-        self.assertEquals(self.has_target('users'), 'users')
-
-    def should_have_users_dynamically_loaded(self):
-        self.assertEquals(self.is_lazy('users'), 'dynamic')
-
-    def should_have_users_secondary_table(self):
-        self.assertEquals(self.has_secondary('users'), 'substags')
-
-
-class DescribeTagNamesAssociationProxy(SubscriptionModelTestCase):
-    def should_be_able_to_add_tag(self):
-        self.subscription.tag_names.append('test-tag1')
-        self.subscription.tag_names.append('test-tag2')
-        self.db.session.flush()
-        self.assertEquals(self.subscription.tag_names[0], 'test-tag1')
-        self.assertEquals(self.subscription.tag_names[1], 'test-tag2')

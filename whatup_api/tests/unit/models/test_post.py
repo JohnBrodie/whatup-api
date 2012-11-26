@@ -128,11 +128,3 @@ class DescribeTagRelationship(PostModelTestCase):
     def should_have_tags_secondary_table(self):
         self.assertEquals(self.has_secondary('tags'), 'posttags')
 
-
-class DescribeTagNamesAssociationProxy(PostModelTestCase):
-    def should_be_able_to_add_tag(self):
-        self.post.tag_names.append('test-tag1')
-        self.post.tag_names.append('test-tag2')
-        self.db.session.flush()
-        self.assertEquals(self.post.tag_names[0], 'test-tag1')
-        self.assertEquals(self.post.tag_names[1], 'test-tag2')
