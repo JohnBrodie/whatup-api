@@ -1,4 +1,8 @@
 """Hello world example"""
+import os
+import sys
+sys.path.append(os.path.abspath('.'))
+
 import config
 import logging
 import logging.config
