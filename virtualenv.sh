@@ -9,6 +9,7 @@ patch lib/python2.7/site-packages/flask_sqlalchemy.py < patch_flask_sqlA.patch
 nosetests --with-xunit
 if [[ $EUID -eq 107 ]]; then
     pkill -f 'python whatup_api/app.py'
+    pkill -f 'python whatup_api/hello.py'
     export WHATUPCONFIG=prod_config.py
     BUILD_ID=dontKillMe python whatup_api/hello.py &
 fi
