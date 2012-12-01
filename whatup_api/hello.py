@@ -62,7 +62,7 @@ def after(response):
     response.headers.add('Access-Control-Allow-Methods',
                          'POST, GET, PUT, PATCH, DELETE, OPTIONS')
     response.headers.add('Access-Control-Allow-Headers',
-                         'Content-Type, X-Requested-With')
+                         'Content-Type, X-Requested-With, DNT')
     response.headers.add('Access-Control-Max-Age', '1728000')
 
     return response
