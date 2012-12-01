@@ -15,6 +15,3 @@ class Tag(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     summary = db.Column(db.String(100))
     name = db.Column(db.String(100), unique=True, nullable=False)
-
-    def __init__(self, name=None):
-        self.name = name
