@@ -1,4 +1,8 @@
 """Hello world example"""
+import os
+import sys
+sys.path.append(os.path.abspath('.'))
+
 import config
 import logging
 import logging.config
@@ -6,7 +10,7 @@ import logging.config
 from ConfigParser import NoSectionError
 from os import environ
 
-from flask import Flask, request
+from flask import Flask
 from flask.ext.restless import APIManager
 
 from whatup_api import models as m
@@ -47,7 +51,7 @@ manager.create_api(m.Subscription, methods=['GET', 'POST', 'PATCH',
 @app.before_request
 def before():
     # Hacky shit for cors
-    request.environ['CONTENT_TYPE'] = 'application/json'
+    # request.environ['CONTENT_TYPE'] = 'application/json'
     log.debug('Incoming request')
 
 
@@ -62,7 +66,7 @@ def after(response):
     response.headers.add('Access-Control-Allow-Methods',
                          'POST, GET, PUT, PATCH, DELETE, OPTIONS')
     response.headers.add('Access-Control-Allow-Headers',
-                         'Content-Type, X-Requested-With')
+                         'Content-Type, X-Requested-With, DNT')
     response.headers.add('Access-Control-Max-Age', '1728000')
 
     return response
@@ -73,4 +77,4 @@ def hello_world():
     return 'Hello World!'
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
