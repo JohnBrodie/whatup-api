@@ -1,0 +1,59 @@
+--- views.py	2012-12-02 03:15:04.000000000 -0500
++++ views2.py	2012-12-02 03:15:28.456996893 -0500
+@@ -668,10 +668,14 @@
+         relations = _get_relations(self.model)
+         tochange = frozenset(relations) & frozenset(params)
+         for columnname in tochange:
+-            toadd = params[columnname].get('add', [])
+-            toremove = params[columnname].get('remove', [])
+-            self._add_to_relation(query, columnname, toadd=toadd)
+-            self._remove_from_relation(query, columnname, toremove=toremove)
++            if isinstance(params[columnname], list):
++                toset = params[columnname]
++                self._set_on_relation(query, columnname, toset=toset)
++            else:
++                toadd = params[columnname].get('add', [])
++                toremove = params[columnname].get('remove', [])
++                self._add_to_relation(query, columnname, toadd=toadd)
++                self._remove_from_relation(query, columnname, toremove=toremove)
+         return tochange
+ 
+     def _handle_validation_exception(self, exception):
+@@ -1115,3 +1119,37 @@
+     def put(self, instid):
+         """Alias for :meth:`patch`."""
+         return self.patch(instid)
++    
++    def _set_on_relation(self, query, relationname, toset=None):
++        """Sets the value of the relation specified by `relationname` on each
++        instance specified by `query` to have the new or existing related
++        models specified by `toset`.
++        
++        This function does not commit the changes made to the database. The
++        calling function has that responsibility.
++        
++        `query` is a SQLAlchemy query instance that evaluates to all instances
++        of the model specified in the constructor of this class that should be
++        updated.
++        
++        `relationname` is the name of a one-to-many relationship which exists
++        on each model specified in `query`.
++        
++        `toset` is a list of dictionaries, each representing the attributes of
++        an existing or new related model to set. If a dictionary contains the
++        key ``'id'``, that instance of the related model will be added.
++        Otherwise, the :classmethod:`~flask.ext.restless.model.get_or_create`
++        class method will be used to get or create a model to set.
++        
++        """
++        submodel = _get_related_model(self.model, relationname)
++        subinst_list = []
++        for dictionary in toset or []:
++            if 'id' in dictionary:
++                subinst = self._get_by(dictionary['id'], submodel)
++            else:
++                kw = unicode_keys_to_strings(dictionary)
++                subinst = _get_or_create(self.session, submodel, **kw)[0]
++            subinst_list.append(subinst)
++        for instance in query:
++            setattr(instance, relationname, subinst_list)
