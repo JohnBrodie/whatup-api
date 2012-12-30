@@ -9,12 +9,14 @@ import logging.config
 
 from ConfigParser import NoSectionError
 from os import environ
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import (ArgumentError, IntegrityError,
+                            OperationalError, InvalidRequestError)
 
 from flask import Flask
 from flask.ext.restless import APIManager
 
 from whatup_api import models as m
+from whatup_api.exceptions import APIError
 
 app = Flask('whatup_api')
 
@@ -36,17 +38,22 @@ if env_var:
     app.logger.info('Using production config')
     app.config.from_envvar('WHATUPCONFIG')
 
+validation_exceptions = [ArgumentError, IntegrityError, OperationalError,
+                         InvalidRequestError, APIError]
 
 db = m.init_app(app)
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
 
 manager.create_api(m.Post, methods=['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
-                   validation_exceptions=[IntegrityError])
-manager.create_api(m.User, methods=['GET', 'POST', 'PATCH', 'PUT'])
-manager.create_api(m.Tag, methods=['GET', 'POST', 'PATCH', 'PUT'])
+                   validation_exceptions=validation_exceptions)
+manager.create_api(m.User, methods=['GET', 'POST', 'PATCH', 'PUT'],
+                   validation_exceptions=validation_exceptions)
+manager.create_api(m.Tag, methods=['GET', 'POST', 'PATCH', 'PUT'],
+                   validation_exceptions=validation_exceptions)
 manager.create_api(m.Subscription, methods=['GET', 'POST', 'PATCH',
-                                            'PUT', 'DELETE'])
+                                            'PUT', 'DELETE'],
+                   validation_exceptions=validation_exceptions)
 
 
 # This function is called before every request.
