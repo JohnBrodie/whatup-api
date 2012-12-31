@@ -1,42 +1,45 @@
 import datetime
-from flask import Flask
-from flask.ext.testing import TestCase
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.properties import RelationshipProperty
 
+from whatup_api.tests import BaseApiTestCase
 import whatup_api.models as m
 import whatup_api.tests.fixtures as fixtures
 
 
-class ModelTestCase(TestCase):
+class ModelTestCase(BaseApiTestCase):
 
-    db_uri = 'mysql://root:whatup@localhost/tests'
     model = None
     columns = None
     relations = None
 
-    def create_app(self):
-        app = Flask(__name__)
-        app.config['SQLALCHEMY_DATABASE_URI'] = self.db_uri
-        return app
+    @classmethod
+    def setUpClass(cls):
+        m.create_tables(cls.app)
+        cls.data = fixtures.install(cls.app, *fixtures.all_data)
+        cls.tag_data = cls.data.TagData
+        cls.user_data = cls.data.UserData
+        cls.post_data = cls.data.PostData
+        cls.subscription_data = cls.data.SubscriptionData
 
-    def setUp(self):
-        m.create_tables(self.app)
-        self.data = fixtures.install(self.app, *fixtures.all_data)
-        self.db = m.init_app(self.app)
-        self.tag_data = self.data.TagData
-        self.user_data = self.data.UserData
-        self.post_data = self.data.PostData
-        self.subscription_data = self.data.SubscriptionData
+        cls.model = getattr(m, cls.model_name)
+        cls.columns, cls.relations = cls.get_columns_and_relations()
 
-    def tearDown(self):
-        self.db.session.remove()
-        self.db.drop_all()
+        for key, value in cls.post_data:
+            setattr(cls, key, cls.db.session.query(cls.model)
+                    .filter_by(id=cls.post_data[key].id).one())
 
-    def compare_time(self, value):
+    @classmethod
+    def tearDownClass(cls):
+        cls.db.session.remove()
+        cls.db.drop_all()
+
+    @classmethod
+    def compare_time(cls, value):
         expected = datetime.datetime.now()
         return abs(value - expected) < datetime.timedelta(minutes=1)
 
+    @classmethod
     def get_columns_and_relations(self):
         fields = set(self.model._sa_class_manager.values())
         columns = {}
