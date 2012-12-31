@@ -39,7 +39,7 @@ if env_var:
     app.config.from_envvar('WHATUPCONFIG')
 
 validation_exceptions = [ArgumentError, IntegrityError, OperationalError,
-                         InvalidRequestError, APIError]
+                         InvalidRequestError, APIError, AttributeError]
 
 db = m.init_app(app)
 

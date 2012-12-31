@@ -1,7 +1,9 @@
 """Model for tags"""
-
-from whatup_api.models import db
+from sqlalchemy.orm import validates
 from sqlalchemy.sql import func
+
+from whatup_api.exceptions import APIError
+from whatup_api.models import db
 
 
 class Tag(db.Model):
@@ -15,3 +17,9 @@ class Tag(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     summary = db.Column(db.String(100))
     name = db.Column(db.String(100), unique=True, nullable=False)
+
+    @validates('name')
+    def validate_name(self, key, name):
+        if not name:
+            raise APIError({'name': 'Must specify name'})
+        return name

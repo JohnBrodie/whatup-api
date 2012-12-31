@@ -1,4 +1,4 @@
-""" users endpoint test"""
+"""users endpoint test"""
 import whatup_api.models as m
 from whatup_api.tests.functional import FunctionalTestCase
 
