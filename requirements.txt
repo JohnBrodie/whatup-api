@@ -3,7 +3,6 @@ Flask==0.9
 Flask-Restless==0.7.0
 Flask-SQLAlchemy==0.16
 Flask-Script==0.5.1
-Flask-Testing==0.4
 Jinja2==2.6
 MySQL-python==1.2.4b5
 SQLAlchemy==0.7.9

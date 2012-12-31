@@ -1,6 +1,8 @@
 """Model for users"""
+from sqlalchemy.orm import validates
 from sqlalchemy.sql import func
 
+from whatup_api.exceptions import APIError
 from whatup_api.models import db
 
 
@@ -19,3 +21,9 @@ class User(db.Model):
                                     lazy='dynamic', primaryjoin="User.id==Subscription.user_id")
     tags_created = db.relationship('Tag', backref='author', lazy='dynamic')
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+
+    @validates('name')
+    def validate_name(self, key, name):
+        if not name:
+            raise APIError({key: 'Must specify name'})
+        return name
