@@ -25,5 +25,5 @@ class User(db.Model):
     @validates('name')
     def validate_name(self, key, name):
         if not name:
-            raise APIError({'name': 'Must specify name'})
+            raise APIError({key: 'Must specify name'})
         return name

@@ -1,4 +1,5 @@
 """Test case for Tag model"""
+from whatup_api.exceptions import APIError
 import whatup_api.models as m
 
 from whatup_api.tests.unit.models import ModelTestCase
@@ -81,3 +82,19 @@ class DescribeAuthorRelationship(TagModelTestCase):
     def should_have_author(self):
         author = self.Default.author
         self.assertEqual(author.id, self.user_data.Default.id)
+
+
+class DescribeValidators(TagModelTestCase):
+    def should_have_name_validation_return_name(self):
+        name = 'name here'
+        returned_name = m.Tag.validate_name(
+            m.Tag(), 'name', name)
+        self.assertEqual(returned_name, name)
+
+    def should_raise_error_on_null_name(self):
+        with self.assertRaises(APIError) as cm:
+            m.Tag.validate_name(
+                m.Tag(), 'name', None)
+
+        error = cm.exception.errors
+        self.assertEqual(error['name'], 'Must specify name')

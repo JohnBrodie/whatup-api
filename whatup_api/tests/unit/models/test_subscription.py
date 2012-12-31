@@ -1,4 +1,5 @@
 """Test case for Subscription model"""
+from whatup_api.exceptions import APIError
 import whatup_api.models as m
 
 from whatup_api.tests.unit.models import ModelTestCase
@@ -61,6 +62,9 @@ class DescribeUserIdColumn(SubscriptionModelTestCase):
     def should_have_user_id_as_integer(self):
         self.assertTrue(self.is_type('user_id', self.db.Integer))
 
+    def should_have_non_nullable_user_id(self):
+        self.assertFalse(self.is_nullable('user_id'))
+
 
 class DescribeUserColumn(SubscriptionModelTestCase):
     def should_have_user(self):
@@ -100,3 +104,19 @@ class DescribeTagRelationship(SubscriptionModelTestCase):
 
     def should_have_tags_secondary_table(self):
         self.assertEquals(self.has_secondary('tags'), 'substags')
+
+
+class DescribeValidators(SubscriptionModelTestCase):
+    def should_have_user_id_validation_return_user_id(self):
+        user_id = 5
+        returned_user_id = m.Subscription.validate_user_id(
+            m.Subscription(), 'user_id', user_id)
+        self.assertEqual(returned_user_id, user_id)
+
+    def should_raise_error_on_null_user_id(self):
+        with self.assertRaises(APIError) as cm:
+            m.Subscription.validate_user_id(
+                m.Subscription(), 'user_id', None)
+
+        error = cm.exception.errors
+        self.assertEqual(error['user_id'], 'Must specify user_id')

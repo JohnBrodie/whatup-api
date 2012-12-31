@@ -1,4 +1,5 @@
 """Test case for User model"""
+from whatup_api.exceptions import APIError
 import whatup_api.models as m
 from whatup_api.tests.unit.models import ModelTestCase
 
@@ -156,3 +157,19 @@ class DescribePostRelationship(UserModelTestCase):
 
     def should_have_posts_backref_to_author(self):
         self.assertEquals(self.has_backref('posts'), 'author')
+
+
+class DescribeValidators(UserModelTestCase):
+    def should_have_name_validation_return_name(self):
+        name = 'name here'
+        returned_name = m.User.validate_name(
+            m.User(), 'name', name)
+        self.assertEqual(returned_name, name)
+
+    def should_raise_error_on_null_name(self):
+        with self.assertRaises(APIError) as cm:
+            m.User.validate_name(
+                m.User(), 'name', None)
+
+        error = cm.exception.errors
+        self.assertEqual(error['name'], 'Must specify name')

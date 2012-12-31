@@ -47,7 +47,18 @@ class WhenCreatingValidSubscription(FunctionalTestCase):
         self.assertIsNotNone(new_subscription)
 
 
-class WhenCreatingInvalidSubscription(FunctionalTestCase):
+class WhenCreatingSubscriptionWithoutUserId(FunctionalTestCase):
+
+    endpoint = '/api/subscriptions'
+    expected_status = 400
+    post_data = {'user_id': None}
+
+    def should_return_validation_error(self):
+        self.assertEqual(self.json['validation_errors']['user_id'],
+                         'Must specify user_id')
+
+
+class WhenCreatingSubscriptionWithInvalidUserId(FunctionalTestCase):
 
     endpoint = '/api/subscriptions'
     expected_status = 400
