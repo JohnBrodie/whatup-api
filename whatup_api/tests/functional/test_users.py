@@ -1,9 +1,9 @@
 """users endpoint test"""
 import whatup_api.models as m
-from whatup_api.tests.functional import FunctionalTestCase
+from whatup_api.tests.functional import _FunctionalTestCase
 
 
-class WhenGettingUsersIndex(FunctionalTestCase):
+class WhenGettingUsersIndex(_FunctionalTestCase):
 
     endpoint = '/api/users'
     expected_status = 200
@@ -12,7 +12,7 @@ class WhenGettingUsersIndex(FunctionalTestCase):
         self.assertEqual(2, len(self.json['objects']))
 
 
-class WhenGettingUserByID(FunctionalTestCase):
+class WhenGettingUserByID(_FunctionalTestCase):
 
     expected_status = 200
     endpoint = '/api/users/1'
@@ -22,16 +22,17 @@ class WhenGettingUserByID(FunctionalTestCase):
                          self.fixture_data.UserData.Default.bio)
 
 
-class WhenGettingUserWithInvalidID(FunctionalTestCase):
+class WhenGettingUserWithInvalidID(_FunctionalTestCase):
 
     endpoint = '/api/users/999'
     expected_status = 404
+    expected_content_type = 'text/html'
 
     def should_return_html_notice(self):
         assert '<title>404 Not Found</title>' in self.response.data
 
 
-class WhenCreatingValidUser(FunctionalTestCase):
+class WhenCreatingValidUser(_FunctionalTestCase):
 
     endpoint = '/api/users'
     expected_status = 201
@@ -47,7 +48,7 @@ class WhenCreatingValidUser(FunctionalTestCase):
         self.assertIsNotNone(new_user)
 
 
-class WhenCreatingInvalidUser(FunctionalTestCase):
+class WhenCreatingInvalidUser(_FunctionalTestCase):
 
     endpoint = '/api/users'
     expected_status = 400
@@ -60,11 +61,13 @@ class WhenCreatingInvalidUser(FunctionalTestCase):
 
 # TODO we should probably add an 'inactive' field to everything,
 # and delete nothing
-class WhenDeletingUsers(FunctionalTestCase):
-    pass
+class WhenDeletingUsers(_FunctionalTestCase):
+
+    endpoint = '/api/tags'
+    expected_status = 200
 
 
-class WhenEditingUsers(FunctionalTestCase):
+class WhenEditingUsers(_FunctionalTestCase):
 
     endpoint = '/api/users/1'
     expected_status = 200
@@ -75,10 +78,11 @@ class WhenEditingUsers(FunctionalTestCase):
 
 
 # TODO this breaks flask-restless
-#class WhenEditingUserWithInvalidID(FunctionalTestCase):
+#class WhenEditingUserWithInvalidID(_FunctionalTestCase):
 #
 #    endpoint = '/api/users/999'
 #    expected_status = 404
+#   expected_content_type = 'text/html'
 #    put_data = {'bio': 'new bio here'}
 #
 #    def should_return_html_notice(self):

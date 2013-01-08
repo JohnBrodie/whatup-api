@@ -1,13 +1,11 @@
-import datetime
 from sqlalchemy.orm.properties import ColumnProperty
 from sqlalchemy.orm.properties import RelationshipProperty
 
-from whatup_api.tests import BaseApiTestCase
+from whatup_api.tests import _BaseApiTestCase
 import whatup_api.models as m
-import whatup_api.tests.fixtures as fixtures
 
 
-class ModelTestCase(BaseApiTestCase):
+class _ModelTestCase(_BaseApiTestCase):
 
     model = None
     columns = None
@@ -15,12 +13,11 @@ class ModelTestCase(BaseApiTestCase):
 
     @classmethod
     def setUpClass(cls):
-        m.create_tables(cls.app)
-        cls.data = fixtures.install(cls.app, *fixtures.all_data)
-        cls.tag_data = cls.data.TagData
-        cls.user_data = cls.data.UserData
-        cls.post_data = cls.data.PostData
-        cls.subscription_data = cls.data.SubscriptionData
+        super(_ModelTestCase, cls).setUpClass()
+        cls.tag_data = cls.fixture_data.TagData
+        cls.user_data = cls.fixture_data.UserData
+        cls.post_data = cls.fixture_data.PostData
+        cls.subscription_data = cls.fixture_data.SubscriptionData
 
         cls.model = getattr(m, cls.model_name)
         cls.columns, cls.relations = cls.get_columns_and_relations()
@@ -30,18 +27,8 @@ class ModelTestCase(BaseApiTestCase):
                     .filter_by(id=cls.post_data[key].id).one())
 
     @classmethod
-    def tearDownClass(cls):
-        cls.db.session.remove()
-        cls.db.drop_all()
-
-    @classmethod
-    def compare_time(cls, value):
-        expected = datetime.datetime.now()
-        return abs(value - expected) < datetime.timedelta(minutes=1)
-
-    @classmethod
-    def get_columns_and_relations(self):
-        fields = set(self.model._sa_class_manager.values())
+    def get_columns_and_relations(cls):
+        fields = set(cls.model._sa_class_manager.values())
         columns = {}
         relations = {}
         for field in fields:
@@ -54,27 +41,72 @@ class ModelTestCase(BaseApiTestCase):
                 relations[relation.key] = relation
         return (columns, relations)
 
-    def is_primary_key(self, column_name):
-        return self.columns[column_name].primary_key
+    # TODO move these tests somewhere and use multiple inheritence?
+    def should_have_table_name(self):
+        expected_table_name = '{0}s'.format(self.model_name.lower())
+        self.assertEqual(self.model.__tablename__, expected_table_name)
 
-    def is_nullable(self, column_name):
-        return self.columns[column_name].nullable
+    def should_have_id_as_pkey(self):
+        self.assertTrue(self.is_primary_key('id'))
 
-    def is_type(self, column_name, type_):
-        return isinstance(self.columns[column_name].type, type_)
+    def should_have_id(self):
+        self.assertEquals(self.Default.id, self.post_data.Default.id)
 
-    def get_length(self, column_name):
-        return self.columns[column_name].type.length
+    def should_have_id_as_integer(self):
+        self.assertTrue(self.is_type('id', self.db.Integer))
 
-    def is_lazy(self, relation_name):
-        return self.relations[relation_name].lazy
+    def should_have_default_created_at(self):
+        self.assertTrue(self.compare_time(self.SpecifiesNone.created_at))
 
-    def has_backref(self, relation_name):
-        return self.relations[relation_name].backref
+    def should_have_created_at_as_datetime(self):
+        self.assertTrue(self.is_type('created_at', self.db.DateTime))
 
-    def has_secondary(self, relation_name):
-        return self.relations[relation_name].secondary.name
+    def should_have_non_nullable_created_at(self):
+        self.assertFalse(self.is_nullable('created_at'))
+
+    def should_have_modified_at(self):
+        self.assertEquals(self.Default.modified_at,
+                          self.post_data.Default.modified_at)
+
+    def should_have_modified_at_as_datetime(self):
+        self.assertTrue(self.is_type('modified_at', self.db.DateTime))
+
+    def should_have_non_nullable_modified_at(self):
+        self.assertFalse(self.is_nullable('modified_at'))
+
+    def should_have_default_modified_at(self):
+        self.assertTrue(self.compare_time(self.SpecifiesNone.modified_at))
+
+    # TODO move these to tests/helpers
+    @classmethod
+    def is_primary_key(cls, column_name):
+        return cls.columns[column_name].primary_key
+
+    @classmethod
+    def is_nullable(cls, column_name):
+        return cls.columns[column_name].nullable
+
+    @classmethod
+    def is_type(cls, column_name, type_):
+        return isinstance(cls.columns[column_name].type, type_)
+
+    @classmethod
+    def get_length(cls, column_name):
+        return cls.columns[column_name].type.length
+
+    @classmethod
+    def is_lazy(cls, relation_name):
+        return cls.relations[relation_name].lazy
+
+    @classmethod
+    def has_backref(cls, relation_name):
+        return cls.relations[relation_name].backref
+
+    @classmethod
+    def has_secondary(cls, relation_name):
+        return cls.relations[relation_name].secondary.name
 
     #  Note: target is the target model's table name
-    def has_target(self, relation_name):
-        return self.relations[relation_name].target.name
+    @classmethod
+    def has_target(cls, relation_name):
+        return cls.relations[relation_name].target.name

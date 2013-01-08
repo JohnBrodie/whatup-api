@@ -1,9 +1,9 @@
 """subscriptions endpoint test"""
 import whatup_api.models as m
-from whatup_api.tests.functional import FunctionalTestCase
+from whatup_api.tests.functional import _FunctionalTestCase
 
 
-class WhenGettingSubscriptionsIndex(FunctionalTestCase):
+class WhenGettingSubscriptionsIndex(_FunctionalTestCase):
 
     endpoint = '/api/subscriptions'
     expected_status = 200
@@ -12,7 +12,7 @@ class WhenGettingSubscriptionsIndex(FunctionalTestCase):
         self.assertEqual(2, len(self.json['objects']))
 
 
-class WhenGettingSubscriptionByID(FunctionalTestCase):
+class WhenGettingSubscriptionByID(_FunctionalTestCase):
 
     expected_status = 200
     endpoint = '/api/subscriptions/1'
@@ -22,16 +22,17 @@ class WhenGettingSubscriptionByID(FunctionalTestCase):
                          self.fixture_data.SubscriptionData.Default.user_id)
 
 
-class WhenGettingSubscriptionWithInvalidID(FunctionalTestCase):
+class WhenGettingSubscriptionWithInvalidID(_FunctionalTestCase):
 
     endpoint = '/api/subscriptions/999'
     expected_status = 404
+    expected_content_type = 'text/html'
 
     def should_return_html_notice(self):
         assert '<title>404 Not Found</title>' in self.response.data
 
 
-class WhenCreatingValidSubscription(FunctionalTestCase):
+class WhenCreatingValidSubscription(_FunctionalTestCase):
 
     endpoint = '/api/subscriptions'
     expected_status = 201
@@ -47,7 +48,7 @@ class WhenCreatingValidSubscription(FunctionalTestCase):
         self.assertIsNotNone(new_subscription)
 
 
-class WhenCreatingSubscriptionWithoutUserId(FunctionalTestCase):
+class WhenCreatingSubscriptionWithoutUserId(_FunctionalTestCase):
 
     endpoint = '/api/subscriptions'
     expected_status = 400
@@ -58,7 +59,7 @@ class WhenCreatingSubscriptionWithoutUserId(FunctionalTestCase):
                          'Must specify user_id')
 
 
-class WhenCreatingSubscriptionWithInvalidUserId(FunctionalTestCase):
+class WhenCreatingSubscriptionWithInvalidUserId(_FunctionalTestCase):
 
     endpoint = '/api/subscriptions'
     expected_status = 400
@@ -70,11 +71,13 @@ class WhenCreatingSubscriptionWithInvalidUserId(FunctionalTestCase):
 
 # TODO we should probably add an 'inactive' field to everything,
 # and delete nothing
-class WhenDeletingSubscriptions(FunctionalTestCase):
-    pass
+class WhenDeletingSubscriptions(_FunctionalTestCase):
+
+    endpoint = '/api/posts'
+    expected_status = 200
 
 
-class WhenEditingSubscriptions(FunctionalTestCase):
+class WhenEditingSubscriptions(_FunctionalTestCase):
 
     endpoint = '/api/subscriptions/1'
     expected_status = 200
@@ -85,10 +88,11 @@ class WhenEditingSubscriptions(FunctionalTestCase):
 
 
 # TODO this breaks flask-restless
-#class WhenEditingSubscriptionWithInvalidID(FunctionalTestCase):
+#class WhenEditingSubscriptionWithInvalidID(_FunctionalTestCase):
 #
 #    endpoint = '/api/subscriptions/999'
 #    expected_status = 404
+#    expected_content_type = 'text/html'
 #    put_data = {'bio': 'new bio here'}
 #
 #    def should_return_html_notice(self):

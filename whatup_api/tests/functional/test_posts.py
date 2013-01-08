@@ -1,9 +1,9 @@
 """ Posts endpoint test"""
 import whatup_api.models as m
-from whatup_api.tests.functional import FunctionalTestCase
+from whatup_api.tests.functional import _FunctionalTestCase
 
 
-class WhenGettingPostsIndex(FunctionalTestCase):
+class WhenGettingPostsIndex(_FunctionalTestCase):
 
     endpoint = '/api/posts'
     expected_status = 200
@@ -12,7 +12,7 @@ class WhenGettingPostsIndex(FunctionalTestCase):
         self.assertEqual(2, len(self.json['objects']))
 
 
-class WhenGettingPostByID(FunctionalTestCase):
+class WhenGettingPostByID(_FunctionalTestCase):
 
     expected_status = 200
     endpoint = '/api/posts/1'
@@ -22,16 +22,17 @@ class WhenGettingPostByID(FunctionalTestCase):
                          self.fixture_data.PostData.Default.body)
 
 
-class WhenGettingPostWithInvalidID(FunctionalTestCase):
+class WhenGettingPostWithInvalidID(_FunctionalTestCase):
 
     endpoint = '/api/posts/999'
     expected_status = 404
+    expected_content_type = 'text/html'
 
     def should_return_html_notice(self):
         assert '<title>404 Not Found</title>' in self.response.data
 
 
-class WhenCreatingValidPost(FunctionalTestCase):
+class WhenCreatingValidPost(_FunctionalTestCase):
 
     endpoint = '/api/posts'
     expected_status = 201
@@ -48,7 +49,7 @@ class WhenCreatingValidPost(FunctionalTestCase):
         self.assertIsNotNone(new_post)
 
 
-class WhenCreatingInvalidPost(FunctionalTestCase):
+class WhenCreatingInvalidPost(_FunctionalTestCase):
 
     endpoint = '/api/posts'
     expected_status = 400
@@ -61,11 +62,13 @@ class WhenCreatingInvalidPost(FunctionalTestCase):
 
 # TODO we should probably add an 'inactive' field to everything,
 # and delete nothing
-class WhenDeletingPosts(FunctionalTestCase):
-    pass
+class WhenDeletingPosts(_FunctionalTestCase):
+
+    endpoint = '/api/posts'
+    expected_status = 200
 
 
-class WhenEditingPosts(FunctionalTestCase):
+class WhenEditingPosts(_FunctionalTestCase):
 
     endpoint = '/api/posts/1'
     expected_status = 200
@@ -77,10 +80,11 @@ class WhenEditingPosts(FunctionalTestCase):
 
 
 # TODO this breaks flask-restless
-#class WhenEditingPostWithInvalidID(FunctionalTestCase):
+#class WhenEditingPostWithInvalidID(_FunctionalTestCase):
 #
 #    endpoint = '/api/posts/999'
 #    expected_status = 404
+#    expected_content_type = 'text/html'
 #    put_data = {'body': 'new body here',
 #                'user_id': 1, 'tags': []}
 #
