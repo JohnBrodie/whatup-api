@@ -1,9 +1,9 @@
 """tags endpoint test"""
 import whatup_api.models as m
-from whatup_api.tests.functional import FunctionalTestCase
+from whatup_api.tests.functional import _FunctionalTestCase
 
 
-class WhenGettingTagsIndex(FunctionalTestCase):
+class WhenGettingTagsIndex(_FunctionalTestCase):
 
     endpoint = '/api/tags'
     expected_status = 200
@@ -12,7 +12,7 @@ class WhenGettingTagsIndex(FunctionalTestCase):
         self.assertEqual(2, len(self.json['objects']))
 
 
-class WhenGettingTagByID(FunctionalTestCase):
+class WhenGettingTagByID(_FunctionalTestCase):
 
     expected_status = 200
     endpoint = '/api/tags/1'
@@ -22,16 +22,17 @@ class WhenGettingTagByID(FunctionalTestCase):
                          self.fixture_data.TagData.Default.summary)
 
 
-class WhenGettingTagWithInvalidID(FunctionalTestCase):
+class WhenGettingTagWithInvalidID(_FunctionalTestCase):
 
     endpoint = '/api/tags/999'
     expected_status = 404
+    expected_content_type = 'text/html'
 
     def should_return_html_notice(self):
         assert '<title>404 Not Found</title>' in self.response.data
 
 
-class WhenCreatingValidTag(FunctionalTestCase):
+class WhenCreatingValidTag(_FunctionalTestCase):
 
     endpoint = '/api/tags'
     expected_status = 201
@@ -47,7 +48,7 @@ class WhenCreatingValidTag(FunctionalTestCase):
         self.assertIsNotNone(new_tag)
 
 
-class WhenCreatingInvalidTag(FunctionalTestCase):
+class WhenCreatingInvalidTag(_FunctionalTestCase):
 
     endpoint = '/api/tags'
     expected_status = 400
@@ -60,11 +61,13 @@ class WhenCreatingInvalidTag(FunctionalTestCase):
 
 # TODO we should probably add an 'inactive' field to everything,
 # and delete nothing
-class WhenDeletingTags(FunctionalTestCase):
-    pass
+class WhenDeletingTags(_FunctionalTestCase):
+
+    endpoint = '/api/tags'
+    expected_status = 200
 
 
-class WhenEditingTags(FunctionalTestCase):
+class WhenEditingTags(_FunctionalTestCase):
 
     endpoint = '/api/tags/1'
     expected_status = 200
@@ -75,10 +78,11 @@ class WhenEditingTags(FunctionalTestCase):
 
 
 # TODO this breaks flask-restless
-#class WhenEditingTagWithInvalidID(FunctionalTestCase):
+#class WhenEditingTagWithInvalidID(_FunctionalTestCase):
 #
 #    endpoint = '/api/tags/999'
 #    expected_status = 404
+#    expected_content_type = 'text/html'
 #    put_data = {'bio': 'new bio here'}
 #
 #    def should_return_html_notice(self):
