@@ -12,6 +12,7 @@ class SubscriptionData(DataSet):
         modified_at = datetime(2001, 10, 11)
         owner = UserData.Default
         subscribee = UserData.Default
+        is_deleted = False
 
     class SpecifiesNone:
         owner = UserData.Default

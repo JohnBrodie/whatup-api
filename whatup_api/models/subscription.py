@@ -24,6 +24,7 @@ class Subscription(db.Model):
     tags = db.relationship("Tag", secondary=lambda: subsTags, lazy='dynamic')
     user = db.Column(db.Integer, db.ForeignKey('users.id'))
     subscribee = db.relationship('User', primaryjoin="User.id==Subscription.user")
+    is_deleted = db.Column(db.Boolean, default=False, nullable=False)
 
     @validates('user_id')
     def validate_user_id(self, key, name):

@@ -13,7 +13,8 @@ class TagData(DataSet):
         author = UserData.Default
         summary = 'summary goes here'
         name = 'defaulttagname'
-    
+        is_deleted = False
+
     class SpecifiesNone:
         author = UserData.Default
         name = 'specifiesnonetagname'

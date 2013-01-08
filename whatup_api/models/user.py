@@ -21,6 +21,7 @@ class User(db.Model):
                                     lazy='dynamic', primaryjoin="User.id==Subscription.user_id")
     tags_created = db.relationship('Tag', backref='author', lazy='dynamic')
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+    is_deleted = db.Column(db.Boolean, default=False, nullable=False)
 
     @validates('name')
     def validate_name(self, key, name):

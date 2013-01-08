@@ -17,6 +17,7 @@ class Tag(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     summary = db.Column(db.String(100))
     name = db.Column(db.String(100), unique=True, nullable=False)
+    is_deleted = db.Column(db.Boolean, default=False, nullable=False)
 
     @validates('name')
     def validate_name(self, key, name):

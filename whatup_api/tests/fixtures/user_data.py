@@ -11,6 +11,7 @@ class UserData(DataSet):
         name = 'Ayush Sobti'
         alias = 'xbonez'
         bio = 'Little is known about Ayush. He is an enigma.'
+        is_deleted = False
 
     class SpecifiesNone:
         name = 'John Doe'

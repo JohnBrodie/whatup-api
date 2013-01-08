@@ -22,5 +22,6 @@ class Post(db.Model):
     body = db.Column(db.String(1000), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     tags = db.relationship("Tag", secondary=lambda: postTags, lazy='dynamic')
+    is_deleted = db.Column(db.Boolean, default=False, nullable=False)
     # TODO REFERENCES
     # TODO ATTACHMENTS

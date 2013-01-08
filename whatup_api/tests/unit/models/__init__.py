@@ -19,12 +19,13 @@ class _ModelTestCase(_BaseApiTestCase):
         cls.post_data = cls.fixture_data.PostData
         cls.subscription_data = cls.fixture_data.SubscriptionData
 
+        cls.model_data = cls.fixture_data[cls.model_name + 'Data']
         cls.model = getattr(m, cls.model_name)
         cls.columns, cls.relations = cls.get_columns_and_relations()
 
-        for key, value in cls.post_data:
+        for key, value in cls.model_data:
             setattr(cls, key, cls.db.session.query(cls.model)
-                    .filter_by(id=cls.post_data[key].id).one())
+                    .filter_by(id=cls.model_data[key].id).one())
 
     @classmethod
     def get_columns_and_relations(cls):
@@ -50,7 +51,7 @@ class _ModelTestCase(_BaseApiTestCase):
         self.assertTrue(self.is_primary_key('id'))
 
     def should_have_id(self):
-        self.assertEquals(self.Default.id, self.post_data.Default.id)
+        self.assertEquals(self.Default.id, self.model_data.Default.id)
 
     def should_have_id_as_integer(self):
         self.assertTrue(self.is_type('id', self.db.Integer))
@@ -66,7 +67,7 @@ class _ModelTestCase(_BaseApiTestCase):
 
     def should_have_modified_at(self):
         self.assertEquals(self.Default.modified_at,
-                          self.post_data.Default.modified_at)
+                          self.model_data.Default.modified_at)
 
     def should_have_modified_at_as_datetime(self):
         self.assertTrue(self.is_type('modified_at', self.db.DateTime))
@@ -76,6 +77,19 @@ class _ModelTestCase(_BaseApiTestCase):
 
     def should_have_default_modified_at(self):
         self.assertTrue(self.compare_time(self.SpecifiesNone.modified_at))
+
+    def should_have_is_deleted(self):
+        self.assertEqual(self.Default.is_deleted,
+                         self.model_data.Default.is_deleted)
+
+    def should_have_non_nullable_is_deleted(self):
+        self.assertFalse(self.is_nullable('is_deleted'))
+
+    def should_have_default_is_deleted(self):
+        self.assertFalse(self.SpecifiesNone.is_deleted)
+
+    def should_have_is_deleted_as_boolean(self):
+        self.assertTrue(self.is_type('is_deleted', self.db.Boolean))
 
     # TODO move these to tests/helpers
     @classmethod

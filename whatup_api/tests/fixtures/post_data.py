@@ -13,6 +13,7 @@ class PostData(DataSet):
         author = UserData.Default
         topic = 'topic goes here'
         body = 'body goes here'
+        is_deleted = False
 
     class SpecifiesNone:
         body = 'Tortoise, plaid, and Swedish meatballs.'
