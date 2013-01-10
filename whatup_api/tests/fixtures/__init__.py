@@ -17,4 +17,5 @@ from whatup_api.tests.fixtures.user_data import UserData
 from whatup_api.tests.fixtures.tag_data import TagData
 from whatup_api.tests.fixtures.post_data import PostData
 from whatup_api.tests.fixtures.subscription_data import SubscriptionData
-all_data = (UserData, TagData, PostData, SubscriptionData,)
+from whatup_api.tests.fixtures.attachment_data import AttachmentData
+all_data = (UserData, TagData, PostData, SubscriptionData, AttachmentData,)

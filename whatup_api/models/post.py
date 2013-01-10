@@ -23,5 +23,6 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     tags = db.relationship("Tag", secondary=lambda: postTags, lazy='dynamic')
     is_deleted = db.Column(db.Boolean, default=False, nullable=False)
+    attachments = db.relationship('Attachment', backref='post', lazy='dynamic')
     # TODO REFERENCES
     # TODO ATTACHMENTS
