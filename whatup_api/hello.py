@@ -96,7 +96,7 @@ def hello_world():
 @app.route('/upload', methods=['POST'])
 def upload(): 
     uploaded_file = request.files['file']
-    upload_dir = config.ATTACHMENTS_DIR
+    upload_dir = app.config['ATTACHMENTS_DIR']
     post_id = request.values['post']
     user_id = request.values['user']
     original_name = uploaded_file.filename.rpartition('/')[2]
