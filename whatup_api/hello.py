@@ -96,6 +96,11 @@ def return_not_found_json(e):
     return jsonify(error=e.message), 404
 
 
+@app.errorhandler(500)
+def return_bad_request_json(e):
+    return jsonify(error='400 Bad Request'), 400
+
+
 @app.route('/')
 def hello_world():
     return 'Hello World!'
