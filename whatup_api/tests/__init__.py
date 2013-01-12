@@ -3,13 +3,12 @@ from unittest2 import TestCase
 
 import whatup_api.models as m
 from . import fixtures
-from whatup_api.app import app
+from whatup_api.app import app, db
 
 
 class _BaseApiTestCase(TestCase):
     """Create an instance of our app for all tests to use"""
-    db_uri = 'mysql://root:whatup@localhost/tests'
-    db = m.init_app(app)
+    db = db
     app = app
 
     @classmethod
@@ -22,7 +21,6 @@ class _BaseApiTestCase(TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.db.session.remove()
-        cls.db.drop_all()
 
     @classmethod
     def compare_time(cls, value):
