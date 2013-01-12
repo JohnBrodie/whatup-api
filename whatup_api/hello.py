@@ -127,7 +127,7 @@ def upload():
     attachment = m.Attachment(user_id = user_id, 
                               post_id = post_id,
                               name = original_name, 
-                              location = upload_dir+'/'+ filename)
+                              location = 'http://assets.projectwhatup.us/'+ filename)
 
     db.session.add(attachment)
     try:
