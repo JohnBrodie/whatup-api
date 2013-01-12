@@ -1,7 +1,6 @@
 """Hello world example"""
 import os
 import sys
-import base64
 sys.path.append(os.path.abspath('.'))
 
 import config
@@ -65,6 +64,8 @@ manager.create_api(m.Subscription, methods=ALL_HTTP_METHODS,
                    exclude_columns=['is_deleted', 'owner.is_deleted',
                                     'subscribee.is_deleted'],
                    validation_exceptions=validation_exceptions)
+
+
 # This function is called before every request.
 @app.before_request
 def before():
@@ -89,12 +90,14 @@ def after(response):
 
     return response
 
+
 @app.route('/')
 def hello_world():
     return 'Hello World!'
 
+
 @app.route('/upload', methods=['POST'])
-def upload(): 
+def upload():
     uploaded_file = request.files['file']
     upload_dir = app.config['ATTACHMENTS_DIR']
     post_id = request.values['post']
@@ -110,36 +113,36 @@ def upload():
     suffix = 1
     while True:
         try:
-            f = open(upload_dir+'/'+temp)
+            f = open(upload_dir + '/' + temp)
             if filename.rfind('.') == -1:
                 temp = filename + '_' + str(suffix)
-            else: 
+            else:
                 fileparts = filename.rpartition('.')
                 temp = fileparts[0] + '_' + str(suffix) + fileparts[1] + fileparts[2]
             suffix += 1
             continue
-        except IOError: 
+        except IOError:
             filename = temp
-            f = open(upload_dir+'/'+filename, b'w')
+            f = open(upload_dir + '/' + filename, b'w')
             break
     uploaded_file.save(f)
 
-    attachment = m.Attachment(user_id = user_id, 
-                              post_id = post_id,
-                              name = original_name, 
-                              location = 'http://assets.projectwhatup.us/'+ filename)
+    attachment = m.Attachment(user_id=user_id,
+                              post_id=post_id,
+                              name=original_name,
+                              location='http://assets.projectwhatup.us/' + filename)
 
     db.session.add(attachment)
     try:
         db.session.commit()
-        response = jsonify(id = attachment.id, 
-                           created_at = str(attachment.created_at), 
-                           modified_at = str(attachment.modified_at), 
-                           user_id = attachment.user_id, 
-                           post_id = attachment.post_id, 
-                           name = attachment.name, 
-                           location = attachment.location)
-    except IntegrityError as e:
+        response = jsonify(id=attachment.id,
+                           created_at=str(attachment.created_at),
+                           modified_at=str(attachment.modified_at),
+                           user_id=attachment.user_id,
+                           post_id=attachment.post_id,
+                           name=attachment.name,
+                           location=attachment.location)
+    except IntegrityError:
         abort(400)
     return response
 
