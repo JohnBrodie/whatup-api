@@ -3,7 +3,7 @@ import os
 import sys
 sys.path.append(os.path.abspath('.'))
 
-import config
+import prod_config
 import logging
 import logging.config
 
@@ -36,11 +36,11 @@ def configure_logging():
 def load_config():
     # Load config, overwrite config with values from file
     # specified as env var, if set.
-    app.config.from_object(config)
-    env_var = environ.get('WHATUPCONFIG')
-    if env_var:
-        app.logger.info('Using production config')
+    if environ.get('WHATUPCONFIG'):
         app.config.from_envvar('WHATUPCONFIG')
+    else:
+        app.logger.info('Using production config')
+        app.config.from_object(prod_config)
 
 
 def _create_api():
