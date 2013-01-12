@@ -138,6 +138,10 @@ def upload():
                            user_id = attachment.user_id, 
                            post_id = attachment.post_id, 
                            name = attachment.name, 
+<<<<<<< HEAD
+=======
+                           is_deleted = attachment.is_deleted, 
+>>>>>>> 86314ede063b9c3cd8dcf9ab08e31c4b29ef20c5
                            location = attachment.location)
     except IntegrityError as e:
         abort(400)
