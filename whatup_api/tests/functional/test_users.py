@@ -59,12 +59,21 @@ class WhenCreatingInvalidUser(_FunctionalTestCase):
                          'Must specify name')
 
 
-# TODO we should probably add an 'inactive' field to everything,
-# and delete nothing
 class WhenDeletingUsers(_FunctionalTestCase):
 
-    endpoint = '/api/tags'
-    expected_status = 200
+    endpoint = '/api/users/1'
+    expected_status = 204
+    delete = True
+
+    def should_not_remove_model(self):
+        query = self.db.session.query(m.User) \
+            .filter_by(id=1)
+        self.assertEqual(query.count(), 1)
+
+    def should_set_is_deleted(self):
+        query = self.db.session.query(m.User) \
+            .filter_by(id=1).one()
+        self.assertEqual(query.is_deleted, True)
 
 
 class WhenEditingUsers(_FunctionalTestCase):

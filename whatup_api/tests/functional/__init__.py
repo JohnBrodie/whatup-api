@@ -28,6 +28,10 @@ class _FunctionalTestCase(_BaseApiTestCase):
                 cls.endpoint, data=dumps(cls.put_data),
                 headers=cls.post_headers)
 
+        elif hasattr(cls, 'delete'):
+            cls.response = cls.client.delete(
+                cls.endpoint, headers=cls.post_headers)
+
         else:
             cls.response = cls.client.get(cls.endpoint)
 
@@ -41,3 +45,6 @@ class _FunctionalTestCase(_BaseApiTestCase):
 
     def should_have_content_type(self):
         self.assertEqual(self.response.content_type, self.expected_content_type)
+
+    def should_not_return_is_deleted(self):
+        self.assertNotIn('is_deleted', self.response.data)

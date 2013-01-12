@@ -69,12 +69,21 @@ class WhenCreatingSubscriptionWithInvalidUserId(_FunctionalTestCase):
         self.assertTrue('validation_errors' in self.json)
 
 
-# TODO we should probably add an 'inactive' field to everything,
-# and delete nothing
 class WhenDeletingSubscriptions(_FunctionalTestCase):
 
-    endpoint = '/api/posts'
-    expected_status = 200
+    endpoint = '/api/subscriptions/1'
+    expected_status = 204
+    delete = True
+
+    def should_not_remove_model(self):
+        query = self.db.session.query(m.Subscription) \
+            .filter_by(id=1)
+        self.assertEqual(query.count(), 1)
+
+    def should_set_is_deleted(self):
+        query = self.db.session.query(m.Subscription) \
+            .filter_by(id=1).one()
+        self.assertEqual(query.is_deleted, True)
 
 
 class WhenEditingSubscriptions(_FunctionalTestCase):

@@ -18,6 +18,8 @@ from flask.ext.restless import APIManager
 from whatup_api import models as m
 from whatup_api.exceptions import APIError
 
+ALL_HTTP_METHODS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
+
 app = Flask('whatup_api')
 
 # Set up logging, tests and running app
@@ -45,14 +47,20 @@ db = m.init_app(app)
 
 manager = APIManager(app, flask_sqlalchemy_db=db)
 
-manager.create_api(m.Post, methods=['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
+manager.create_api(m.Post, methods=ALL_HTTP_METHODS,
+                   exclude_columns=['is_deleted', 'author.is_deleted'],
                    validation_exceptions=validation_exceptions)
-manager.create_api(m.User, methods=['GET', 'POST', 'PATCH', 'PUT'],
+manager.create_api(m.User, methods=ALL_HTTP_METHODS,
+                   exclude_columns=['is_deleted', 'tags_created.is_deleted',
+                                    'subscriptions.is_deleted',
+                                    'posts.is_deleted'],
                    validation_exceptions=validation_exceptions)
-manager.create_api(m.Tag, methods=['GET', 'POST', 'PATCH', 'PUT'],
+manager.create_api(m.Tag, methods=ALL_HTTP_METHODS,
+                   exclude_columns=['is_deleted', 'author.is_deleted'],
                    validation_exceptions=validation_exceptions)
-manager.create_api(m.Subscription, methods=['GET', 'POST', 'PATCH',
-                                            'PUT', 'DELETE'],
+manager.create_api(m.Subscription, methods=ALL_HTTP_METHODS,
+                   exclude_columns=['is_deleted', 'owner.is_deleted',
+                                    'subscribee.is_deleted'],
                    validation_exceptions=validation_exceptions)
 
 
