@@ -3,7 +3,7 @@ from unittest2 import TestCase
 
 import whatup_api.models as m
 from . import fixtures
-from whatup_api.hello import app
+from whatup_api.app import app
 
 
 class _BaseApiTestCase(TestCase):
