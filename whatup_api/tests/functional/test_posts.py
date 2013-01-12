@@ -1,7 +1,7 @@
 """ Posts endpoint test"""
 import json
 import whatup_api.models as m
-from whatup_api.tests.functional import _FunctionalTestCase
+from whatup_api.tests.functional import _FunctionalTestCase, _NotFoundTestCase
 
 
 class WhenGettingPostsIndex(_FunctionalTestCase):
@@ -23,14 +23,9 @@ class WhenGettingPostByID(_FunctionalTestCase):
                          self.fixture_data.PostData.Default.body)
 
 
-class WhenGettingPostWithInvalidID(_FunctionalTestCase):
+class WhenGettingPostWithInvalidID(_NotFoundTestCase):
 
     endpoint = '/api/posts/999'
-    expected_status = 404
-    expected_content_type = 'text/html'
-
-    def should_return_html_notice(self):
-        assert '<title>404 Not Found</title>' in self.response.data
 
 
 class WhenCreatingValidPost(_FunctionalTestCase):

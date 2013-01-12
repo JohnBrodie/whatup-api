@@ -1,6 +1,6 @@
 """tags endpoint test"""
 import whatup_api.models as m
-from whatup_api.tests.functional import _FunctionalTestCase
+from whatup_api.tests.functional import _FunctionalTestCase, _NotFoundTestCase
 
 
 class WhenGettingTagsIndex(_FunctionalTestCase):
@@ -22,14 +22,9 @@ class WhenGettingTagByID(_FunctionalTestCase):
                          self.fixture_data.TagData.Default.summary)
 
 
-class WhenGettingTagWithInvalidID(_FunctionalTestCase):
+class WhenGettingTagWithInvalidID(_NotFoundTestCase):
 
     endpoint = '/api/tags/999'
-    expected_status = 404
-    expected_content_type = 'text/html'
-
-    def should_return_html_notice(self):
-        assert '<title>404 Not Found</title>' in self.response.data
 
 
 class WhenCreatingValidTag(_FunctionalTestCase):

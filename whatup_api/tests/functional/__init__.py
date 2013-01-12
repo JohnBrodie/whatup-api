@@ -53,3 +53,13 @@ class _FunctionalTestCase(_BaseApiTestCase):
 
     def should_not_return_is_deleted(self):
         self.assertNotIn('is_deleted', self.response.data)
+
+
+class _NotFoundTestCase(_FunctionalTestCase):
+
+    expected_status = 404
+    expected_content_type = 'application/json'
+
+    def should_return_not_found_json(self):
+        self.assertEqual(self.json['error'],
+                         u'404 Not Found')

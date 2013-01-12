@@ -1,6 +1,6 @@
 """subscriptions endpoint test"""
 import whatup_api.models as m
-from whatup_api.tests.functional import _FunctionalTestCase
+from whatup_api.tests.functional import _FunctionalTestCase, _NotFoundTestCase
 
 
 class WhenGettingSubscriptionsIndex(_FunctionalTestCase):
@@ -22,14 +22,9 @@ class WhenGettingSubscriptionByID(_FunctionalTestCase):
                          self.fixture_data.SubscriptionData.Default.user_id)
 
 
-class WhenGettingSubscriptionWithInvalidID(_FunctionalTestCase):
+class WhenGettingSubscriptionWithInvalidID(_NotFoundTestCase):
 
     endpoint = '/api/subscriptions/999'
-    expected_status = 404
-    expected_content_type = 'text/html'
-
-    def should_return_html_notice(self):
-        assert '<title>404 Not Found</title>' in self.response.data
 
 
 class WhenCreatingValidSubscription(_FunctionalTestCase):

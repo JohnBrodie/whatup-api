@@ -91,6 +91,11 @@ def after(response):
     return response
 
 
+@app.errorhandler(404)
+def return_not_found_json(e):
+    return jsonify(error=e.message), 404
+
+
 @app.route('/')
 def hello_world():
     return 'Hello World!'
