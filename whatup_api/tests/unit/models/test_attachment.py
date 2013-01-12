@@ -10,15 +10,6 @@ class AttachmentModelTestCase(_ModelTestCase):
 
 class DescribeAttachmentModel(AttachmentModelTestCase):
 
-    def should_have_table_name(self):
-        self.assertEquals(self.Default.__tablename__, 'attachments')
-
-    def should_have_id_as_pkey(self):
-        self.assertTrue(self.is_primary_key('id'))
-
-    def should_have_id(self):
-        self.assertEquals(self.Default.id, self.attachment_data.Default.id)
-
     def should_have_name(self):
         self.assertEquals(self.Default.name, self.attachment_data.Default.name)
 

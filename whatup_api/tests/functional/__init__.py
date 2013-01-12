@@ -18,7 +18,12 @@ class _FunctionalTestCase(_BaseApiTestCase):
     def get_response(cls):
         if not hasattr(cls, 'endpoint'):
             return
-        if hasattr(cls, 'post_data'):
+        if hasattr(cls, 'filename'):
+            cls.response = cls.client.post(
+                cls.endpoint, data=cls.post_data,
+                headers=cls.post_headers)
+
+        elif hasattr(cls, 'post_data'):
             cls.response = cls.client.post(
                 cls.endpoint, data=dumps(cls.post_data),
                 headers=cls.post_headers)
