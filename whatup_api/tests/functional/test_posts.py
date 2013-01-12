@@ -1,4 +1,5 @@
 """ Posts endpoint test"""
+import json
 import whatup_api.models as m
 from whatup_api.tests.functional import _FunctionalTestCase
 
@@ -75,6 +76,10 @@ class WhenDeletingPosts(_FunctionalTestCase):
         query = self.db.session.query(m.Post) \
             .filter_by(id=1).one()
         self.assertEqual(query.is_deleted, True)
+
+    def should_not_return_deleted(self):
+        response_data = json.loads(self.client.get('/api/posts').data)
+        self.assertNotEqual(response_data['objects'][0]['id'], 1)
 
 
 class WhenEditingPosts(_FunctionalTestCase):

@@ -12,7 +12,7 @@ from os import environ
 from sqlalchemy.exc import (ArgumentError, IntegrityError,
                             OperationalError, InvalidRequestError)
 
-from flask import Flask
+from flask import Flask, request
 from flask.ext.restless import APIManager
 
 from whatup_api import models as m
