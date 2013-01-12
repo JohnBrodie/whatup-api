@@ -50,12 +50,13 @@ db = m.init_app(app)
 manager = APIManager(app, flask_sqlalchemy_db=db)
 
 manager.create_api(m.Post, methods=ALL_HTTP_METHODS,
-                   exclude_columns=['is_deleted', 'author.is_deleted'],
+                   exclude_columns=['is_deleted', 'author.is_deleted', 'attachments.is_deleted'],
                    validation_exceptions=validation_exceptions)
 manager.create_api(m.User, methods=ALL_HTTP_METHODS,
                    exclude_columns=['is_deleted', 'tags_created.is_deleted',
                                     'subscriptions.is_deleted',
-                                    'posts.is_deleted'],
+                                    'posts.is_deleted',
+                                    'attachments.is_deleted'],
                    validation_exceptions=validation_exceptions)
 manager.create_api(m.Tag, methods=ALL_HTTP_METHODS,
                    exclude_columns=['is_deleted', 'author.is_deleted'],
