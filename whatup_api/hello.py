@@ -12,75 +12,95 @@ from os import environ
 from sqlalchemy.exc import (ArgumentError, IntegrityError,
                             OperationalError, InvalidRequestError)
 
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify, abort, redirect
 from flask.ext.restless import APIManager
 
 from whatup_api import models as m
 from whatup_api.exceptions import APIError
 
-ALL_HTTP_METHODS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
-
 app = Flask('whatup_api')
 
-# Set up logging, tests and running app
-# have different paths.
-try:
-    logging.config.fileConfig('setup.cfg')
-except NoSectionError:
-    logging.config.fileConfig('../../setup.cfg')
 
-log = logging.getLogger('whatupAPI')
-app.logger.addHandler(log)
+def configure_logging():
+    # Set up logging, tests and running app
+    # have different paths.
+    try:
+        logging.config.fileConfig('setup.cfg')
+    except NoSectionError:
+        logging.config.fileConfig('../../setup.cfg')
 
-# Load config, overwrite config with values from file
-# specified as env var, if set.
+    log = logging.getLogger('whatupAPI')
+    app.logger.addHandler(log)
 
-app.config.from_object(config)
-env_var = environ.get('WHATUPCONFIG')
-if env_var:
-    app.logger.info('Using production config')
-    app.config.from_envvar('WHATUPCONFIG')
 
-validation_exceptions = [ArgumentError, IntegrityError, OperationalError,
-                         InvalidRequestError, APIError, AttributeError]
+def load_config():
+    # Load config, overwrite config with values from file
+    # specified as env var, if set.
+    app.config.from_object(config)
+    env_var = environ.get('WHATUPCONFIG')
+    if env_var:
+        app.logger.info('Using production config')
+        app.config.from_envvar('WHATUPCONFIG')
 
+
+def _create_api():
+    ALL_HTTP_METHODS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
+
+    validation_exceptions = [ArgumentError, IntegrityError, OperationalError,
+                             InvalidRequestError, APIError, AttributeError]
+
+    manager = APIManager(app, flask_sqlalchemy_db=db)
+
+    manager.create_api(
+        m.Post,
+        methods=ALL_HTTP_METHODS,
+        exclude_columns=[
+            'is_deleted',
+            'author.is_deleted',
+            'attachments.is_deleted',
+        ],
+        validation_exceptions=validation_exceptions
+    )
+    manager.create_api(
+        m.User,
+        methods=ALL_HTTP_METHODS,
+        exclude_columns=[
+            'is_deleted',
+            'tags_created.is_deleted',
+            'subscriptions.is_deleted',
+            'posts.is_deleted',
+            'attachments.is_deleted',
+        ],
+        validation_exceptions=validation_exceptions
+    )
+    manager.create_api(
+        m.Tag,
+        methods=ALL_HTTP_METHODS,
+        exclude_columns=[
+            'is_deleted',
+            'author.is_deleted',
+        ],
+        validation_exceptions=validation_exceptions
+    )
+    manager.create_api(
+        m.Subscription,
+        methods=ALL_HTTP_METHODS,
+        exclude_columns=[
+            'is_deleted',
+            'owner.is_deleted',
+            'subscribee.is_deleted',
+        ],
+        validation_exceptions=validation_exceptions
+    )
+
+configure_logging()
+load_config()
 db = m.init_app(app)
-
-manager = APIManager(app, flask_sqlalchemy_db=db)
-
-manager.create_api(m.Post, methods=ALL_HTTP_METHODS,
-                   exclude_columns=['is_deleted', 'author.is_deleted', 'attachments.is_deleted'],
-                   validation_exceptions=validation_exceptions)
-manager.create_api(m.User, methods=ALL_HTTP_METHODS,
-                   exclude_columns=['is_deleted', 'tags_created.is_deleted',
-                                    'subscriptions.is_deleted',
-                                    'posts.is_deleted',
-                                    'attachments.is_deleted'],
-                   validation_exceptions=validation_exceptions)
-manager.create_api(m.Tag, methods=ALL_HTTP_METHODS,
-                   exclude_columns=['is_deleted', 'author.is_deleted'],
-                   validation_exceptions=validation_exceptions)
-manager.create_api(m.Subscription, methods=ALL_HTTP_METHODS,
-                   exclude_columns=['is_deleted', 'owner.is_deleted',
-                                    'subscribee.is_deleted'],
-                   validation_exceptions=validation_exceptions)
+_create_api()
 
 
-# This function is called before every request.
-@app.before_request
-def before():
-    # Hacky shit for cors
-    # request.environ['CONTENT_TYPE'] = 'application/json'
-    log.debug('Incoming request')
-
-
-# This function is called after every request,
-# so we can muck with the response here.
 @app.after_request
-def after(response):
-    log.debug('request complete')
-
-    # more CORS hackness
+def add_cors_headers(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Methods',
                          'POST, GET, PUT, PATCH, DELETE, OPTIONS')
