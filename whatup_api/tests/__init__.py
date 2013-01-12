@@ -14,6 +14,7 @@ class _BaseApiTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.db.drop_all()
         cls.client = cls.app.test_client()
         m.create_tables(cls.app)
         cls.fixture_data = fixtures.install(cls.app, *fixtures.all_data)
