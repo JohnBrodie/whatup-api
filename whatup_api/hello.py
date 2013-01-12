@@ -12,7 +12,7 @@ from ConfigParser import NoSectionError
 from os import environ
 from sqlalchemy.exc import (ArgumentError, IntegrityError,
                             OperationalError, InvalidRequestError)
-from flask import Flask, request, send_from_directory, redirect, url_for, flash
+from flask import Flask, request, send_from_directory, redirect, url_for, flash, jsonify, abort
 from werkzeug import secure_filename
 from flask.ext.restless import APIManager
 
@@ -84,30 +84,57 @@ def after(response):
 def hello_world():
     return 'Hello World!'
 
-@app.route('/upload', methods=['GET', 'POST'])
+@app.route('/upload', methods=['POST'])
 def upload(): 
-    if request.method == 'POST' and 'file' in request.files:
-        uploaded_file = request.files['file']
-        db = m.db
-        if not os.path.exists(config.ATTACHMENTS_DIR):
-            os.makedirs(config.ATTACHMENTS_DIR)
-        while(True):
-            fileName = base64.urlsafe_b64encode(os.urandom(30))
-            try:
-                f = open(config.ATTACHMENTS_DIR+'/'+fileName)
-                continue
-            except IOError:
-                f = open(config.ATTACHMENTS_DIR+'/'+fileName, b'w')
-                break
-        uploaded_file.save(f)
-        attachment = m.Attachment(user_id = request.values['user'], post_id = request.values['post'], name = uploaded_file.filename, location = fileName)
-        db.session.add(attachment)
+    uploaded_file = request.files['file']
+    upload_dir = config.ATTACHMENTS_DIR
+    post_id = request.values['post']
+    user_id = request.values['user']
+    original_name = uploaded_file.filename.rpartition('/')[2]
+    filename = str(post_id) + '_' + original_name
+    db = m.db
+
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+
+    temp = filename
+    suffix = 1
+    while True:
         try:
-            db.session.commit()
-        except IntegrityError as e:
-            return e.message
-        return str(attachment.id)
-    return "unsuccessful"
+            f = open(upload_dir+'/'+temp)
+            if filename.rfind('.') == -1:
+                temp = filename + '_' + str(suffix)
+            else: 
+                fileparts = filename.rpartition('.')
+                temp = fileparts[0] + '_' + str(suffix) + fileparts[1] + fileparts[2]
+            suffix += 1
+            continue
+        except IOError: 
+            filename = temp
+            f = open(upload_dir+'/'+filename, b'w')
+            break
+    uploaded_file.save(f)
+
+    attachment = m.Attachment(user_id = user_id, 
+                              post_id = post_id,
+                              name = original_name, 
+                              location = upload_dir+'/'+ filename)
+
+    db.session.add(attachment)
+    try:
+        db.session.commit()
+        response = jsonify(id = attachment.id, 
+                           created_at = str(attachment.created_at), 
+                           modified_at = str(attachment.modified_at), 
+                           user_id = attachment.user_id, 
+                           post_id = attachment.post_id, 
+                           name = attachment.name, 
+                           is_deleted = attachment.is_deleted, 
+                           location = attachment.location)
+    except IntegrityError as e:
+        abort(400)
+    return response
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
