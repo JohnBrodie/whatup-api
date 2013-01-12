@@ -102,8 +102,9 @@ def return_bad_request_json(e):
 
 
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
+def redirect_api_root():
+    # TODO: Redirect to api docs.
+    redirect('https://google.com')
 
 
 @app.route('/upload', methods=['POST'])
