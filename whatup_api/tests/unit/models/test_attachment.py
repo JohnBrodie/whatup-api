@@ -34,6 +34,9 @@ class DescribeAttachmentModel(AttachmentModelTestCase):
     def should_have_non_nullable_location(self):
         self.assertFalse(self.is_nullable('location'))
 
+    def should_have_non_nullable_user(self):
+        self.assertFalse(self.is_nullable('user_id'))
+
     def should_have_post(self):
         post = self.Default.post
         self.assertEqual(post.id, self.post_data.Default.id)

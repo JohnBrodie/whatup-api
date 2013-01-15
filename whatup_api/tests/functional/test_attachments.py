@@ -18,16 +18,12 @@ class WhenUploadingFile(_FunctionalTestCase):
         self.assertEqual(self.json['user_id'],
                          self.fixture_data.UserData.Default.id)
 
-    def should_return_attachment_post(self):
-        self.assertEqual(self.json['post_id'],
-                         self.fixture_data.PostData.Default.id)
-
     def should_return_filename(self):
         self.assertEqual(self.json['name'], self.filename)
 
     def should_have_file_in_attachments_dir(self):
         try:
-            open(config.ATTACHMENTS_DIR + '/' + str(self.fixture_data.PostData.Default.id) + '_' + self.filename)
+            open(config.ATTACHMENTS_DIR + '/' + self.json['location'])
             assert True
         except IOError:
             assert False
@@ -39,19 +35,7 @@ class WhenUploadingFile(_FunctionalTestCase):
 class WhenOmittingUser(_FunctionalTestCase):
     post_headers = [('Content-Type', 'multipart/form-data')]
     expected_status = 400
-    expected_content_type = 'text/html'
     endpoint = '/upload'
     filename = 'test.png'
     filepath = os.path.join(os.path.dirname(__file__), filename)
-    post_data = {'file': open(filepath),
-                 'post': 1}
-
-class WhenOmittingPost(_FunctionalTestCase):
-    post_headers = [('Content-Type', 'multipart/form-data')]
-    expected_status = 400
-    expected_content_type = 'text/html'
-    endpoint = '/upload'
-    filename = 'test.png'
-    filepath = os.path.join(os.path.dirname(__file__), filename)
-    post_data = {'file': open(filepath),
-                 'user': 1}
+    post_data = {'file': open(filepath)}

@@ -2,6 +2,7 @@
 import os
 import sys
 sys.path.append(os.path.abspath('.'))
+import base64
 
 import prod_config
 import logging
@@ -131,37 +132,28 @@ def redirect_api_root():
 def upload():
     uploaded_file = request.files['file']
     upload_dir = app.config['ATTACHMENTS_DIR']
-    post_id = request.values['post']
+    if request.values.get('user') == None:
+        abort(500)
     user_id = request.values['user']
     original_name = uploaded_file.filename.rpartition('/')[2]
-    filename = str(post_id) + '_' + original_name
     db = m.db
 
     if not os.path.exists(upload_dir):
         os.makedirs(upload_dir)
 
-    temp = filename
-    suffix = 1
     while True:
+        filename = base64.urlsafe_b64encode(os.urandom(30))
         try:
-            f = open(upload_dir + '/' + temp)
-            if filename.rfind('.') == -1:
-                temp = filename + '_' + str(suffix)
-            else:
-                fileparts = filename.rpartition('.')
-                temp = fileparts[0] + '_' + str(suffix) + fileparts[1] + fileparts[2]
-            suffix += 1
+            f = open(upload_dir + '/' + filename)
             continue
         except IOError:
-            filename = temp
             f = open(upload_dir + '/' + filename, b'w')
             break
     uploaded_file.save(f)
 
     attachment = m.Attachment(user_id=user_id,
-                              post_id=post_id,
                               name=original_name,
-                              location='http://assets.projectwhatup.us/' + filename)
+                              location=filename)
 
     db.session.add(attachment)
     try:
@@ -170,11 +162,10 @@ def upload():
                            created_at=str(attachment.created_at),
                            modified_at=str(attachment.modified_at),
                            user_id=attachment.user_id,
-                           post_id=attachment.post_id,
                            name=attachment.name,
                            location=attachment.location)
     except IntegrityError:
-        abort(400)
+        abort(500)
     return response
 
 
