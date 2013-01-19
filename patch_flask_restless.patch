@@ -1,6 +1,6 @@
 diff -rupN flask_restless/search.py flask_restless2/search.py
---- flask_restless/search.py	2013-01-19 05:29:17.000000000 -0500
-+++ flask_restless2/search.py	2013-01-19 05:30:44.323019105 -0500
+--- flask_restless/search.py	2013-01-19 07:16:05.000000000 -0500
++++ flask_restless2/search.py	2013-01-19 07:13:01.694687237 -0500
 @@ -155,39 +155,95 @@ class Filter(object):
          otherfield = dictionary.get('field')
          return Filter(fieldname, operator, argument, otherfield)
@@ -68,44 +68,40 @@ diff -rupN flask_restless/search.py flask_restless2/search.py
 -        `offset`, if not ``None``, specifies the number of initial results to
 -        skip in the result set.
 +            {'name': 'age', 'op': 'lt', 'other': height}
- 
--        `order_by` is a list of :class:`OrderBy` objects, representing the
--        ordering directives to apply to the result set which matches the
--        search.
++
 +        where ``dictionary['name']`` is the name of the field of the model on
 +        which to apply the operator, ``dictionary['op']`` is the name of the
 +        operator to apply, ``dictionary['val']`` is the value on the right to
 +        which the operator will be applied, and ``dictionary['other']`` is the
 +        name of the other field of the model to which the operator will be
 +        applied.
- 
-         """
--        self.filters = filters or []
--        self.limit = limit
--        self.offset = offset
--        self.order_by = order_by or []
++
++        """
 +        fieldname = dictionary.get('name')
 +        operator = dictionary.get('op')
 +        argument = dictionary.get('val')
 +        otherfield = dictionary.get('field')
 +        return Disjunction(fieldname, operator, argument, otherfield)
-+
+ 
+-        `order_by` is a list of :class:`OrderBy` objects, representing the
+-        ordering directives to apply to the result set which matches the
+-        search.
 +class SearchParameters(object):
 +    """Aggregates the parameters for a search, including filters, search type,
 +    limit, offset, and order by directives.
-+
+ 
 +    """
 +    def __init__(self, filters=None, disjunctions=None, limit=None, offset=None, order_by=None):
 +        """ Patch restless SearchParameters object to
 +        always exclude is_deleted rows.
 +    
-+        """
-+        self.filters = filters or []
+         """
+         self.filters = filters or []
 +        self.disjunctions = disjunctions or []
 +        self.filters.append(Filter("is_deleted", "neq", 1))
-+        self.limit = limit
-+        self.offset = offset
-+        self.order_by = order_by or []
+         self.limit = limit
+         self.offset = offset
+         self.order_by = order_by or []
  
      def __repr__(self):
          """Returns a string representation of the search parameters."""
@@ -171,7 +167,7 @@ diff -rupN flask_restless/search.py flask_restless2/search.py
      def create_query(session, model, search_params):
          """Builds an SQLAlchemy query instance based on the search parameters
          present in ``search_params``, an instance of :class:`SearchParameters`.
-@@ -352,12 +439,20 @@ class QueryBuilder(object):
+@@ -352,12 +439,22 @@ class QueryBuilder(object):
  
          """
          # Adding field filters
@@ -179,13 +175,15 @@ diff -rupN flask_restless/search.py flask_restless2/search.py
          # may raise exception here
          filters = QueryBuilder._create_filters(model, search_params)
 +        disjunctions = QueryBuilder._create_disjunctions(model, search_params)
-+        if filters:
-+            query = session.query(model)
++
++        query = session.query(model)
++
          for filt in filters:
              query = query.filter(filt)
  
-+        if disjunctions and not filters:
-+                query = session.query(model).filter(disjunctions[0])
++        if disjunctions:
++            query = session.query(model).filter(disjunctions[0])
++
 +        for disj in disjunctions:
 +            q = session.query(model).filter(disj)
 +            query = query.union(q)
@@ -194,8 +192,8 @@ diff -rupN flask_restless/search.py flask_restless2/search.py
          for val in search_params.order_by:
              field = getattr(model, val.field)
 diff -rupN flask_restless/views.py flask_restless2/views.py
---- flask_restless/views.py	2013-01-19 05:29:17.000000000 -0500
-+++ flask_restless2/views.py	2013-01-19 05:30:44.323019105 -0500
+--- flask_restless/views.py	2013-01-19 07:16:05.000000000 -0500
++++ flask_restless2/views.py	2013-01-19 07:13:01.698687237 -0500
 @@ -668,10 +668,14 @@ class API(ModelView):
          relations = _get_relations(self.model)
          tochange = frozenset(relations) & frozenset(params)
