@@ -1,6 +1,202 @@
---- views.py	2012-12-02 03:15:04.000000000 -0500
-+++ views2.py	2012-12-02 03:15:28.456996893 -0500
-@@ -668,10 +668,14 @@
+diff -rupN flask_restless/search.py flask_restless2/search.py
+--- flask_restless/search.py	2013-01-19 05:29:17.000000000 -0500
++++ flask_restless2/search.py	2013-01-19 05:30:44.323019105 -0500
+@@ -155,39 +155,95 @@ class Filter(object):
+         otherfield = dictionary.get('field')
+         return Filter(fieldname, operator, argument, otherfield)
+ 
++class Disjunction(object):
++    """Represents a disjunction to apply to a SQL query.
+ 
+-class SearchParameters(object):
+-    """Aggregates the parameters for a search, including filters, search type,
+-    limit, offset, and order by directives.
++    A disjunction can be, for example, a comparison operator applied to a field of a
++    model and a value or a comparison applied to two fields of the same
++    model. For more information on possible disjunctions, see :ref:`search`.
+ 
+     """
+ 
+-    def __init__(self, filters=None, limit=None, offset=None, order_by=None):
++    def __init__(self, fieldname, operator, argument=None, otherfield=None):
+         """Instantiates this object with the specified attributes.
+ 
+-        `filters` is a list of :class:`Filter` objects, representing filters to
+-        be applied during the search.
++        `fieldname` is the name of the field of a model which will be on the
++        left side of the operator.
++
++        `operator` is the string representation of an operator to apply. The
++        full list of recognized operators can be found at :ref:`search`.
++
++        If `argument` is specified, it is the value to place on the right side
++        of the operator. If `otherfield` is specified, that field on the model
++        will be placed on the right side of the operator.
++
++        .. admonition:: About `argument` and `otherfield`
++
++           Some operators don't need either argument and some need exactly one.
++           However, this constructor will not raise any errors or otherwise
++           inform you of which situation you are in; it is basically just a
++           named tuple. Calling code must handle errors caused by missing
++           required arguments.
++
++        """
++        self.fieldname = fieldname
++        self.operator = operator
++        self.argument = argument
++        self.otherfield = otherfield
++
++    def __repr__(self):
++        """Returns a string representation of this object."""
++        return '<Disjunction {} {} {}>'.format(self.fieldname, self.operator,
++                                          self.argument or self.otherfield)
++
++    @staticmethod
++    def from_dictionary(dictionary):
++        """Returns a new :class:`Disjunction` object with arguments parsed from
++        `dictionary`.
++
++        `dictionary` is a dictionary of the form::
++
++            {'name': 'age', 'op': 'lt', 'val': 20}
+ 
+-        `limit`, if not ``None``, specifies the maximum number of results to
+-        return in the search.
++        or::
+ 
+-        `offset`, if not ``None``, specifies the number of initial results to
+-        skip in the result set.
++            {'name': 'age', 'op': 'lt', 'other': height}
+ 
+-        `order_by` is a list of :class:`OrderBy` objects, representing the
+-        ordering directives to apply to the result set which matches the
+-        search.
++        where ``dictionary['name']`` is the name of the field of the model on
++        which to apply the operator, ``dictionary['op']`` is the name of the
++        operator to apply, ``dictionary['val']`` is the value on the right to
++        which the operator will be applied, and ``dictionary['other']`` is the
++        name of the other field of the model to which the operator will be
++        applied.
+ 
+         """
+-        self.filters = filters or []
+-        self.limit = limit
+-        self.offset = offset
+-        self.order_by = order_by or []
++        fieldname = dictionary.get('name')
++        operator = dictionary.get('op')
++        argument = dictionary.get('val')
++        otherfield = dictionary.get('field')
++        return Disjunction(fieldname, operator, argument, otherfield)
++
++class SearchParameters(object):
++    """Aggregates the parameters for a search, including filters, search type,
++    limit, offset, and order by directives.
++
++    """
++    def __init__(self, filters=None, disjunctions=None, limit=None, offset=None, order_by=None):
++        """ Patch restless SearchParameters object to
++        always exclude is_deleted rows.
++    
++        """
++        self.filters = filters or []
++        self.disjunctions = disjunctions or []
++        self.filters.append(Filter("is_deleted", "neq", 1))
++        self.limit = limit
++        self.offset = offset
++        self.order_by = order_by or []
+ 
+     def __repr__(self):
+         """Returns a string representation of the search parameters."""
+-        return ('<SearchParameters filters={}, order_by={}, limit={},'
+-                ' offset={}>').format(self.filters, self.order_by, self.limit,
++        return ('<SearchParameters filters={}, disjunctions={}, order_by={}, limit={},'
++                ' offset={}>').format(self.filters, self.disjunctions, self.order_by, self.limit,
+                                       self.offset)
+ 
+     @staticmethod
+@@ -218,14 +274,15 @@ class SearchParameters(object):
+         # for the sake of brevity...
+         from_dict = Filter.from_dictionary
+         filters = [from_dict(f) for f in dictionary.get('filters', [])]
++        from_dict = Disjunction.from_dictionary
++        disjunctions = [from_dict(f) for f in dictionary.get('disjunctions', [])]
+         # HACK In Python 2.5, unicode dictionary keys are not allowed.
+         order_by_list = dictionary.get('order_by', [])
+         order_by_list = (unicode_keys_to_strings(o) for o in order_by_list)
+         order_by = [OrderBy(**o) for o in order_by_list]
+         limit = dictionary.get('limit')
+         offset = dictionary.get('offset')
+-        return SearchParameters(filters=filters, limit=limit, offset=offset,
+-                                order_by=order_by)
++        return SearchParameters(filters=filters, disjunctions=disjunctions, limit=limit, offset=offset, order_by=order_by)
+ 
+ 
+ class QueryBuilder(object):
+@@ -328,6 +385,36 @@ class QueryBuilder(object):
+         return filters
+ 
+     @staticmethod
++    def _create_disjunctions(model, search_params):
++        """Returns the list of operations on `model` specified in the
++        :attr:`disjunctions` attribute on the `search_params` object.
++
++        `search-params` is an instance of the :class:`SearchParameters` class
++        whose fields represent the parameters of the search.
++
++        Raises one of :exc:`AttributeError`, :exc:`KeyError`, or
++        :exc:`TypeError` if there is a problem creating the query. See the
++        documentation for :func:`_create_operation` for more information.
++
++        """
++        disjunctions = []
++        for disj in search_params.disjunctions:
++            fname = disj.fieldname
++            val = disj.argument
++            # get the relationship from the field name, if it exists
++            relation = None
++            if '__' in fname:
++                relation, fname = fname.split('__')
++            # get the other field to which to compare, if it exists
++            if disj.otherfield:
++                val = getattr(model, disj.otherfield)
++            # for the sake of brevity...
++            create_op = QueryBuilder._create_operation
++            param = create_op(model, fname, disj.operator, val, relation)
++            disjunctions.append(param)
++        return disjunctions
++
++    @staticmethod
+     def create_query(session, model, search_params):
+         """Builds an SQLAlchemy query instance based on the search parameters
+         present in ``search_params``, an instance of :class:`SearchParameters`.
+@@ -352,12 +439,20 @@ class QueryBuilder(object):
+ 
+         """
+         # Adding field filters
+-        query = session.query(model)
+         # may raise exception here
+         filters = QueryBuilder._create_filters(model, search_params)
++        disjunctions = QueryBuilder._create_disjunctions(model, search_params)
++        if filters:
++            query = session.query(model)
+         for filt in filters:
+             query = query.filter(filt)
+ 
++        if disjunctions and not filters:
++                query = session.query(model).filter(disjunctions[0])
++        for disj in disjunctions:
++            q = session.query(model).filter(disj)
++            query = query.union(q)
++
+         # Order the search
+         for val in search_params.order_by:
+             field = getattr(model, val.field)
+diff -rupN flask_restless/views.py flask_restless2/views.py
+--- flask_restless/views.py	2013-01-19 05:29:17.000000000 -0500
++++ flask_restless2/views.py	2013-01-19 05:30:44.323019105 -0500
+@@ -668,10 +668,14 @@ class API(ModelView):
          relations = _get_relations(self.model)
          tochange = frozenset(relations) & frozenset(params)
          for columnname in tochange:
@@ -19,7 +215,32 @@
          return tochange
  
      def _handle_validation_exception(self, exception):
-@@ -1115,3 +1119,37 @@
+@@ -957,21 +961,15 @@ class API(ModelView):
+         return jsonify(result)
+ 
+     def delete(self, instid):
+-        """Removes the specified instance of the model with the specified name
+-        from the database.
+-
+-        Since :http:method:`delete` is an idempotent method according to the
+-        :rfc:`2616`, this method responds with :http:status:`204` regardless of
+-        whether an object was deleted.
+-
+-        """
+         self._check_authentication()
+         inst = self._get_by(instid)
+         if inst is not None:
+-            self.session.delete(inst)
++            inst.is_deleted = True
+             self.session.commit()
+         return jsonify_status_code(204)
+ 
++
++
+     def post(self):
+         """Creates a new instance of a given model based on request data.
+ 
+@@ -1115,3 +1113,37 @@ class API(ModelView):
      def put(self, instid):
          """Alias for :meth:`patch`."""
          return self.patch(instid)
