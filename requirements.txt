@@ -3,6 +3,7 @@ coverage==3.5.3
 distribute==0.6.28
 Distutils2==1.0a4
 fixture==1.4
+Flask-OpenID==1.1.1
 Flask-Restless==0.7.0
 Flask-Script==0.5.1
 Flask-SQLAlchemy==0.16
