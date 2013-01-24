@@ -17,3 +17,6 @@ functional-test:
 
 acceptance-test:
 	. bin/activate; WHATUPCONFIG=${CONFIG} nosetests -sx --tests=acceptance
+
+app:
+	. bin/activate; WHATUPCONFIG=${CONFIG} python whatup_api/app.py
