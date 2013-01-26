@@ -15,30 +15,39 @@ class _FunctionalTestCase(_BaseApiTestCase):
         cls.get_response()
 
     @classmethod
+    def set_openid_key(cls, client):
+        with client.session_transaction() as session:
+            session['openid'] = 'openidkey'
+
+    @classmethod
     def get_response(cls):
         if not hasattr(cls, 'endpoint'):
             return
-        if hasattr(cls, 'filename'):
-            cls.response = cls.client.post(
-                cls.endpoint, data=cls.post_data,
-                headers=cls.post_headers)
 
-        elif hasattr(cls, 'post_data'):
-            cls.response = cls.client.post(
-                cls.endpoint, data=dumps(cls.post_data),
-                headers=cls.post_headers)
+        with cls.client as client:
+            cls.set_openid_key(client)
 
-        elif hasattr(cls, 'put_data'):
-            cls.response = cls.client.put(
-                cls.endpoint, data=dumps(cls.put_data),
-                headers=cls.post_headers)
+            if hasattr(cls, 'filename'):
+                cls.response = client.post(
+                    cls.endpoint, data=cls.post_data,
+                    headers=cls.post_headers)
 
-        elif hasattr(cls, 'delete'):
-            cls.response = cls.client.delete(
-                cls.endpoint, headers=cls.post_headers)
+            elif hasattr(cls, 'post_data'):
+                cls.response = client.post(
+                    cls.endpoint, data=dumps(cls.post_data),
+                    headers=cls.post_headers)
 
-        else:
-            cls.response = cls.client.get(cls.endpoint)
+            elif hasattr(cls, 'put_data'):
+                cls.response = client.put(
+                    cls.endpoint, data=dumps(cls.put_data),
+                    headers=cls.post_headers)
+
+            elif hasattr(cls, 'delete'):
+                cls.response = client.delete(
+                    cls.endpoint, headers=cls.post_headers)
+
+            else:
+                cls.response = client.get(cls.endpoint)
 
         try:
             cls.json = loads(cls.response.data)
