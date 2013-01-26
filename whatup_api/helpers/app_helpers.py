@@ -77,6 +77,8 @@ def create_api(app):
             'author.is_deleted',
             'attachments.is_deleted',
         ],
+        authentication_required_for=ALL_HTTP_METHODS,
+        authentication_function=check_login,
         validation_exceptions=validation_exceptions
     )
     manager.create_api(
@@ -89,6 +91,8 @@ def create_api(app):
             'posts.is_deleted',
             'attachments.is_deleted',
         ],
+        authentication_required_for=ALL_HTTP_METHODS,
+        authentication_function=check_login,
         validation_exceptions=validation_exceptions
     )
     manager.create_api(
@@ -110,5 +114,7 @@ def create_api(app):
             'owner.is_deleted',
             'subscribee.is_deleted',
         ],
+        authentication_required_for=ALL_HTTP_METHODS,
+        authentication_function=check_login,
         validation_exceptions=validation_exceptions
     )
