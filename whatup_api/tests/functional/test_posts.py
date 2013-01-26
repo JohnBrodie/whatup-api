@@ -32,8 +32,7 @@ class WhenCreatingValidPost(_FunctionalTestCase):
 
     endpoint = '/api/posts'
     expected_status = 201
-    post_data = {'body': 'body here',
-                 'user_id': 1}
+    post_data = {'body': 'body here'}
     new_id = 3
 
     def should_return_new_post_id(self):
@@ -81,7 +80,7 @@ class WhenEditingPosts(_FunctionalTestCase):
     endpoint = '/api/posts/1'
     expected_status = 200
     put_data = {'body': 'new body here',
-                'user_id': 1, 'tags': []}
+                'tags': []}
 
     def should_return_edited_post_data(self):
         self.assertEqual(self.put_data['body'], self.json['body'])
@@ -94,7 +93,7 @@ class WhenEditingPosts(_FunctionalTestCase):
 #    expected_status = 404
 #    expected_content_type = 'text/html'
 #    put_data = {'body': 'new body here',
-#                'user_id': 1, 'tags': []}
+#                'tags': []}
 #
 #    def should_return_html_notice(self):
 #        assert '<title>404 Not Found</title>' in self.response.data
