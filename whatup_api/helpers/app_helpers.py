@@ -11,7 +11,7 @@ from sqlalchemy.exc import (
 )
 
 
-import prod_config
+from whatup_api import prod_config
 from whatup_api import models as m
 from whatup_api.exceptions import APIError
 
