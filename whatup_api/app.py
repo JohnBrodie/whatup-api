@@ -133,7 +133,7 @@ def redirect_api_root():
 def upload():
     uploaded_file = request.files['file']
     upload_dir = app.config['ATTACHMENTS_DIR']
-    if request.values.get('user') == None:
+    if not request.values.get('user'):
         abort(500)
     user_id = request.values['user']
     original_name = uploaded_file.filename.rpartition('/')[2]
