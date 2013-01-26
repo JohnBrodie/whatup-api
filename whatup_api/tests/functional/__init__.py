@@ -12,47 +12,62 @@ class _FunctionalTestCase(_BaseApiTestCase):
     @classmethod
     def setUpClass(cls):
         super(_FunctionalTestCase, cls).setUpClass()
-        cls.get_response()
+        cls.response = cls.get_response()
+        cls.json = cls.response_to_json(cls.response)
 
     @classmethod
-    def set_openid_key(cls, client):
-        with client.session_transaction() as session:
+    def response_to_json(cls, response):
+        json = None
+        try:
+            json = loads(response.data)
+        except ValueError:
+            pass
+        return json
+
+    @classmethod
+    def set_openid_key(cls):
+        with cls.client.session_transaction() as session:
             session['openid'] = 'openidkey'
 
     @classmethod
-    def get_response(cls):
+    def remove_openid_key(cls):
+        with cls.client.session_transaction() as session:
+            if session.get('openid'):
+                del session['openid']
+
+    @classmethod
+    def get_response(cls, login=True):
         if not hasattr(cls, 'endpoint'):
             return
+        response = ''
 
-        with cls.client as client:
-            cls.set_openid_key(client)
+        with cls.client:
+            if login:
+                cls.set_openid_key()
 
             if hasattr(cls, 'filename'):
-                cls.response = client.post(
+                response = cls.client.post(
                     cls.endpoint, data=cls.post_data,
                     headers=cls.post_headers)
 
             elif hasattr(cls, 'post_data'):
-                cls.response = client.post(
+                response = cls.client.post(
                     cls.endpoint, data=dumps(cls.post_data),
                     headers=cls.post_headers)
 
             elif hasattr(cls, 'put_data'):
-                cls.response = client.put(
+                response = cls.client.put(
                     cls.endpoint, data=dumps(cls.put_data),
                     headers=cls.post_headers)
 
             elif hasattr(cls, 'delete'):
-                cls.response = client.delete(
+                response = cls.client.delete(
                     cls.endpoint, headers=cls.post_headers)
 
             else:
-                cls.response = client.get(cls.endpoint)
+                response = cls.client.get(cls.endpoint)
 
-        try:
-            cls.json = loads(cls.response.data)
-        except ValueError:
-            cls.json = None
+        return response
 
     def should_have_status(self):
         self.assertEqual(self.response.status_code, self.expected_status)
@@ -62,6 +77,27 @@ class _FunctionalTestCase(_BaseApiTestCase):
 
     def should_not_return_is_deleted(self):
         self.assertNotIn('is_deleted', self.response.data)
+
+    def should_return_302_status_code_if_not_logged_in(self):
+        if hasattr(self, 'filename'):
+            return
+
+        self.remove_openid_key()
+        response = self.get_response(login=False)
+        self.assertEqual(response.status_code, 302)
+
+    def should_redirect_if_not_logged_in(self):
+        if hasattr(self, 'filename'):
+            return
+        expected_html = (
+            '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 '
+            'Final//EN">\n<title>Redirecting...</title>\n<h1>Redirecting...'
+            '</h1>\n<p>You should be redirected automatically to target URL: '
+            '<a href="/login">/login</a>.  If not click the link.'
+        )
+        self.remove_openid_key()
+        response = self.get_response(login=False)
+        self.assertEqual(response.data, expected_html)
 
 
 class _NotFoundTestCase(_FunctionalTestCase):
