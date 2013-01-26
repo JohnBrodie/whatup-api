@@ -11,7 +11,7 @@ class WhenUploadingFile(_FunctionalTestCase):
     endpoint = '/upload'
     filename = 'test.png'
     filepath = os.path.join(os.path.dirname(__file__), filename)
-    post_data = {'file': open(filepath),
+    post_data = {'file': None,
                  'user': 1,
                  'post': 1}
     def should_return_attachment_user(self):
@@ -38,4 +38,4 @@ class WhenOmittingUser(_FunctionalTestCase):
     endpoint = '/upload'
     filename = 'test.png'
     filepath = os.path.join(os.path.dirname(__file__), filename)
-    post_data = {'file': open(filepath)}
+    post_data = {'file': None}

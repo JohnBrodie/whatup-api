@@ -46,6 +46,8 @@ class _FunctionalTestCase(_BaseApiTestCase):
                 cls.set_openid_key()
 
             if hasattr(cls, 'filename'):
+                if hasattr(cls, 'filepath'):
+                    cls.post_data['file'] = open(cls.filepath)
                 response = cls.client.post(
                     cls.endpoint, data=cls.post_data,
                     headers=cls.post_headers)
@@ -78,26 +80,23 @@ class _FunctionalTestCase(_BaseApiTestCase):
     def should_not_return_is_deleted(self):
         self.assertNotIn('is_deleted', self.response.data)
 
-    def should_return_302_status_code_if_not_logged_in(self):
-        if hasattr(self, 'filename'):
-            return
-
+    def should_return_401_status_code_if_not_logged_in(self):
         self.remove_openid_key()
         response = self.get_response(login=False)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 401)
 
-    def should_redirect_if_not_logged_in(self):
-        if hasattr(self, 'filename'):
-            return
-        expected_html = (
-            '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 '
-            'Final//EN">\n<title>Redirecting...</title>\n<h1>Redirecting...'
-            '</h1>\n<p>You should be redirected automatically to target URL: '
-            '<a href="/login">/login</a>.  If not click the link.'
-        )
+    def should_return_json_if_not_logged_in(self):
+        expected_content_type = 'application/json'
         self.remove_openid_key()
         response = self.get_response(login=False)
-        self.assertEqual(response.data, expected_html)
+        self.assertEqual(response.content_type, expected_content_type)
+
+    def should_return_login_url_if_not_logged_in(self):
+        expected_url = '/login'
+        self.remove_openid_key()
+        response = self.get_response(login=False)
+        json_response = self.response_to_json(response)
+        self.assertEqual(json_response['url'], expected_url)
 
 
 class _NotFoundTestCase(_FunctionalTestCase):

@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 
 from whatup_api.app import app
 from whatup_api import models as m
+from whatup_api.helpers.app_helpers import check_login
 
 
 @app.route('/', methods=['GET'])
@@ -16,6 +17,10 @@ def api_root():
 
 @app.route('/upload', methods=['POST'])
 def upload():
+
+    if not check_login():
+        abort(401)
+
     uploaded_file = request.files['file']
     upload_dir = app.config['ATTACHMENTS_DIR']
     if not request.values.get('user'):
