@@ -126,5 +126,6 @@ def create_api(app):
         ],
         authentication_required_for=ALL_HTTP_METHODS,
         authentication_function=check_login,
-        validation_exceptions=validation_exceptions
+        validation_exceptions=validation_exceptions,
+        post_form_preprocessor=add_user_to_request,
     )
