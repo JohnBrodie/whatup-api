@@ -13,8 +13,9 @@ from os import environ
 from sqlalchemy.exc import (ArgumentError, IntegrityError,
                             OperationalError, InvalidRequestError)
 
-from flask import Flask, request, jsonify, abort, redirect
+from flask import Flask, request, jsonify, abort, redirect, g, session
 from flask.ext.restless import APIManager
+from flask_openid import OpenID
 
 from whatup_api import models as m
 from whatup_api.exceptions import APIError
@@ -97,7 +98,30 @@ def _create_api():
 configure_logging()
 load_config()
 db = m.init_app(app)
+
+open_id = OpenID(app)
+
 _create_api()
+
+
+@app.before_request
+def before_request():
+    g.user = None
+    if 'openid' in session:
+        g.user = db.User.query.filter_by(openid=session['openid']).first()
+
+
+@open_id.loginhandler
+def login():
+    if g.user is not None:
+        return redirect(open_id.get_next_url())
+    if request.method == 'POST':
+        oid = request.form.get('openid')
+        if oid:
+            return open_id.try_login(oid, ask_for=['email', 'fullname',
+                                                   'nickname'])
+
+    return 'Login form here!'
 
 
 @app.after_request
