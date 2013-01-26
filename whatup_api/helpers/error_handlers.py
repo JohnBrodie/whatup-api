@@ -1,7 +1,11 @@
-from flask import jsonify, redirect, url_for
+from flask import jsonify
 
 
 def configure_error_handlers(app):
+
+    @app.errorhandler(401)
+    def return_unauthorized(e):
+        return jsonify(url='/login'), 401
 
     @app.errorhandler(404)
     def return_not_found_json(e):
@@ -14,7 +18,3 @@ def configure_error_handlers(app):
     @app.errorhandler(500)
     def return_bad_request_json(e):
         return jsonify(error='400 Bad Request'), 400
-
-    @app.errorhandler(401)
-    def return_login_redirect(e):
-        return redirect(url_for('login'))
