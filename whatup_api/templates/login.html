@@ -9,11 +9,11 @@
     }
   </script>
 
+  <h2>Sign in</h2>
   {% for provider_name, provider_url in providers.iteritems() %}
   <a href=javascript:oidSubmit("{{provider_url}}");>Sign in with {{provider_name}}</a>
   <br />
   {% endfor %}
-  <h2>Sign in</h2>
   <form action="" method=post>
     {% if error %}<p class=error><strong>Error:</strong> {{ error }}</p>{% endif %}
     <p>
