@@ -1,6 +1,6 @@
 import os
 from base64 import urlsafe_b64encode
-from flask import request, abort, jsonify
+from flask import request, abort, jsonify, g
 from sqlalchemy.exc import IntegrityError
 
 from whatup_api.app import app
@@ -21,11 +21,13 @@ def upload():
     if not check_login():
         abort(401)
 
+    if not len(request.files):
+        return jsonify(error='No files in request'), 400
+
     uploaded_file = request.files['file']
     upload_dir = app.config['ATTACHMENTS_DIR']
-    if not request.values.get('user'):
-        abort(500)
-    user_id = request.values['user']
+
+    user_id = g.user.id
     original_name = uploaded_file.filename.rpartition('/')[2]
 
     if not os.path.exists(upload_dir):

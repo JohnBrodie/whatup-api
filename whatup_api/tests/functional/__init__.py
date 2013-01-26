@@ -47,7 +47,11 @@ class _FunctionalTestCase(_BaseApiTestCase):
 
             if hasattr(cls, 'filename'):
                 if hasattr(cls, 'filepath'):
-                    cls.post_data['file'] = open(cls.filepath)
+                    try:
+                        cls.post_data['file'] = open(cls.filepath)
+                    except IOError:
+                        cls.post_data['file'] = None
+
                 response = cls.client.post(
                     cls.endpoint, data=cls.post_data,
                     headers=cls.post_headers)
