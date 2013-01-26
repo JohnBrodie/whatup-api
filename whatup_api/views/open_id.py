@@ -1,6 +1,6 @@
 from flask import (
-    flash, g, redirect, render_template,
-    request, session, url_for,
+    abort, flash, g, redirect,
+    render_template, request, session,
 )
 
 from whatup_api.app import app, open_id
@@ -46,7 +46,7 @@ with a terrible URL which we certainly don't want.
         email = resp.email
     except AttributeError:
         flash('Name and Email needed from OpenID provider')
-        return redirect(url_for('login'))
+        abort(401)
 
     try:
         nickname = resp.nickname
@@ -63,7 +63,7 @@ with a terrible URL which we certainly don't want.
         m.db.session.add(new_user)
         m.db.session.commit()
     except Exception:
-        return redirect(url_for('login'))
+        abort(401)
 
     return redirect(open_id.get_next_url())
 
