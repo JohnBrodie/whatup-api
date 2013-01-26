@@ -32,41 +32,40 @@ with a terrible URL which we certainly don't want.
     session['openid'] = resp.identity_url
     user = m.User.query.filter_by(openid=resp.identity_url).first()
     if user is not None:
+        # User exists in db, sign them in
         flash(u'Successfully signed in')
         g.user = user
         return redirect(open_id.get_next_url())
-    return redirect(url_for('create_profile', next=open_id.get_next_url(),
-                            name=resp.fullname or resp.nickname,
-                            email=resp.email))
 
+    nickname = None
+    fullname = None
+    email = None
 
-@app.route('/create-profile', methods=['GET', 'POST'])
-def create_profile():
-    """If this is the user's first login, the create_or_login function
-will redirect here so that the user can set up his profile.
-"""
-    if hasattr(g, 'user') and g.user is not None or 'openid' not in session:
-        return redirect(url_for('index'))
-    if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        if not name:
-            flash(u'Error: you have to provide a name')
-        elif '@' not in email:
-            flash(u'Error: you have to enter a valid email address')
-        else:
-            flash(u'Profile successfully created')
-            #db_session.add(User(name, email, session['openid']))
-            #db_session.commit()
-            # TODO: check what fields we can get, modify user model
-            # TODO: Expect ANY of these fields to be null!
-            new_user = m.User(name=name, email=email, openid=session['openid'])
-            m.db.session.add(new_user)
-            # TODO: try/catch
-            m.db.session.commit()
+    try:
+        fullname = resp.fullname
+        email = resp.email
+    except AttributeError:
+        flash('Name and Email needed from OpenID provider')
+        return redirect(url_for('login'))
 
-            return redirect(open_id.get_next_url())
-    return render_template('create_profile.html', next_url=open_id.get_next_url())
+    try:
+        nickname = resp.nickname
+    except AttributeError:
+        pass
+
+    new_user = m.User(
+        name=fullname,
+        email=email,
+        openid=session['openid'],
+        alias=nickname,
+    )
+    try:
+        m.db.session.add(new_user)
+        m.db.session.commit()
+    except Exception:
+        return redirect(url_for('login'))
+
+    return redirect(open_id.get_next_url())
 
 
 @app.route('/logout')
