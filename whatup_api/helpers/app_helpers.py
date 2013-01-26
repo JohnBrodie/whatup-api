@@ -57,6 +57,15 @@ def load_config(app):
         app.config.from_object(prod_config)
 
 
+def add_user_to_request(post_data):
+    """ Add the current user to post data
+    before passing the request on to the model.
+
+    """
+    post_data['user_id'] = g.user.id
+    return post_data
+
+
 def create_api(app):
     """ Use Flask-Restless to create API endpoints based on
     our models.
@@ -79,7 +88,8 @@ def create_api(app):
         ],
         authentication_required_for=ALL_HTTP_METHODS,
         authentication_function=check_login,
-        validation_exceptions=validation_exceptions
+        validation_exceptions=validation_exceptions,
+        post_form_preprocessor=add_user_to_request,
     )
     manager.create_api(
         m.User,

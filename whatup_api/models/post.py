@@ -1,7 +1,9 @@
 """Model for posts"""
-
-from whatup_api.models import db
+from sqlalchemy.orm import validates
 from sqlalchemy.sql import func
+
+from whatup_api.exceptions import APIError
+from whatup_api.models import db
 
 postTags = db.Table('posttags', db.metadata,
                     db.Column('post', db.Integer, db.ForeignKey('posts.id')),
@@ -26,3 +28,9 @@ class Post(db.Model):
     attachments = db.relationship('Attachment', backref='post', lazy='dynamic')
     # TODO REFERENCES
     # TODO ATTACHMENTS
+
+    @validates('body')
+    def validate_name(self, key, body):
+        if not body:
+            raise APIError({key: 'Must specify body'})
+        return body

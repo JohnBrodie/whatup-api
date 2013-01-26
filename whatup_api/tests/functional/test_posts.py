@@ -49,8 +49,7 @@ class WhenCreatingInvalidPost(_FunctionalTestCase):
 
     endpoint = '/api/posts'
     expected_status = 400
-    post_data = {'body': 'body here',
-                 'user_id': 999}
+    post_data = {'body': None}
 
     def should_return_validation_error(self):
         self.assertTrue('validation_errors' in self.json)
