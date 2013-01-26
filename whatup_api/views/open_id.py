@@ -2,6 +2,7 @@ from flask import (
     abort, flash, g, redirect,
     render_template, request, session,
 )
+from flask_openid import COMMON_PROVIDERS
 
 from whatup_api.app import app, open_id
 from whatup_api import models as m
@@ -18,8 +19,12 @@ def login():
             return open_id.try_login(oid, ask_for=['email', 'fullname',
                                                    'nickname'])
 
-    return render_template('login.html', next=open_id.get_next_url(),
-                           error=open_id.fetch_error())
+    return render_template(
+        'login.html',
+        next=open_id.get_next_url(),
+        error=open_id.fetch_error(),
+        providers=COMMON_PROVIDERS,
+    )
 
 
 @open_id.after_login
