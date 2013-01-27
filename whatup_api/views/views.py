@@ -1,12 +1,13 @@
 import os
-from base64 import urlsafe_b64encode
 from flask import request, abort, jsonify, g
 from sqlalchemy.exc import IntegrityError
 
 from whatup_api.app import app
 from whatup_api import models as m
-from whatup_api.helpers.app_helpers import check_login
-
+from whatup_api.helpers.app_helpers import (check_login,
+                                        get_new_attachment_filename,
+                                        create_attachment_from_url,
+                                        create_attachment_from_file)
 
 @app.route('/', methods=['GET'])
 @app.route('/api', methods=['GET'])
@@ -14,43 +15,26 @@ def api_root():
     """Redirect to API docs."""
     return 'TODO: Replace with API Docs'
 
-
 @app.route('/upload', methods=['POST'])
 def upload():
     """When a file is POSTed to this endpoint, it is given
     a random name and a new Attachment object is saved.
 
-    """
+    """ 
     if not check_login():
         abort(401)
 
-    if not len(request.files):
-        return jsonify(error='No files in request'), 400
-
-    uploaded_file = request.files['file']
-    upload_dir = app.config['ATTACHMENTS_DIR']
-
-    user_id = g.user.id
-    original_name = uploaded_file.filename.rpartition('/')[2]
-
-    if not os.path.exists(upload_dir):
-        os.makedirs(upload_dir)
-
-    while True:
-        filename = urlsafe_b64encode(os.urandom(30))
+    if len(request.files):
+        attachment = create_attachment_from_file(request.files['file'], app.config)
+    elif 'url' in request.form:
         try:
-            f = open('/'.join([upload_dir, filename]))
-            continue
+            attachment = create_attachment_from_url(request.form['url'], app.config)
         except IOError:
-            f = open('/'.join([upload_dir, filename]), b'w')
-            break
-    uploaded_file.save(f)
-
-    attachment = m.Attachment(
-        user_id=user_id,
-        name=original_name,
-        location=filename,
-    )
+            return jsonify(error='Failed to download file'), 400
+        except ValueError:
+            return jsonify(error='Invalid URL'), 400
+    else:
+        return jsonify(error='No files in request'), 400
 
     m.db.session.add(attachment)
     try:
@@ -62,7 +46,7 @@ def upload():
         id=attachment.id,
         created_at=str(attachment.created_at),
         modified_at=str(attachment.modified_at),
-        user_id=user_id,
+        user_id=attachment.user_id,
         name=attachment.name,
         location=attachment.location,
     )

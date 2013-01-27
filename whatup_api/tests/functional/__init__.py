@@ -56,6 +56,11 @@ class _FunctionalTestCase(_BaseApiTestCase):
                     cls.endpoint, data=cls.post_data,
                     headers=cls.post_headers)
 
+            elif ('Content-Type', 'multipart/form-data') in cls.post_headers:
+                response = cls.client.post(
+                    cls.endpoint, data=cls.post_data,
+                    headers=cls.post_headers)
+
             elif hasattr(cls, 'post_data'):
                 response = cls.client.post(
                     cls.endpoint, data=dumps(cls.post_data),
