@@ -133,3 +133,10 @@ class DescribeUserModel(UserModelTestCase):
 
         error = cm.exception.errors
         self.assertEqual(error['name'], 'Must specify name')
+
+    def should_have_revisions_relation_to_revisions_model(self):
+        self.assertEquals(self.has_target('revisions'), 'revisions')
+
+    def should_have_revisions_dynamically_loaded(self):
+        self.assertEquals(self.is_lazy('revisions'), 'dynamic')
+

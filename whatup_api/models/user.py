@@ -24,6 +24,7 @@ class User(db.Model):
     tags_created = db.relationship('Tag', backref='author', lazy='dynamic')
     attachments = db.relationship('Attachment', backref='uploader', lazy='dynamic')
     posts = db.relationship('Post', backref='author', lazy='dynamic')
+    revisions = db.relationship('Revision', backref='author', lazy='dynamic')
     is_deleted = db.Column(db.Boolean, default=False, nullable=False)
 
     @validates('name')

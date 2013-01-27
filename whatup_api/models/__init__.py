@@ -24,3 +24,4 @@ from whatup_api.models.tag import Tag
 from whatup_api.models.post import Post
 from whatup_api.models.subscription import Subscription
 from whatup_api.models.attachment import Attachment
+from whatup_api.models.revision import Revision

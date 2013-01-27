@@ -19,6 +19,7 @@ class _ModelTestCase(_BaseApiTestCase):
         cls.post_data = cls.fixture_data.PostData
         cls.subscription_data = cls.fixture_data.SubscriptionData
         cls.attachment_data = cls.fixture_data.AttachmentData
+        cls.revision_data = cls.fixture_data.RevisionData
 
         cls.model_data = cls.fixture_data[cls.model_name + 'Data']
         cls.model = getattr(m, cls.model_name)

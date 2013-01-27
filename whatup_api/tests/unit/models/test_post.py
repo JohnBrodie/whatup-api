@@ -10,12 +10,6 @@ class PostModelTestCase(_ModelTestCase):
 
 class DescribePostModel(PostModelTestCase):
 
-    def should_have_rev_id(self):
-        self.assertEquals(self.Default.rev_id, self.post_data.Default.rev_id)
-
-    def should_have_rev_id_as_integer(self):
-        self.assertTrue(self.is_type('rev_id', self.db.Integer))
-
     def should_have_topic(self):
         self.assertEquals(self.Default.topic, self.post_data.Default.topic)
 
@@ -63,3 +57,10 @@ class DescribePostModel(PostModelTestCase):
 
     def should_have_tags_secondary_table(self):
         self.assertEquals(self.has_secondary('tags'), 'posttags')
+
+    def should_have_revisions_relation_to_revisions_model(self):
+        self.assertEquals(self.has_target('revisions'), 'revisions')
+
+    def should_have_revisions_dynamically_loaded(self):
+        self.assertEquals(self.is_lazy('revisions'), 'dynamic')
+

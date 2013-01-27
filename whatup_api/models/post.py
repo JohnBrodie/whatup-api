@@ -17,13 +17,13 @@ class Post(db.Model):
     __tablename__ = 'posts'
 
     id = db.Column(db.Integer, primary_key=True)
-    rev_id = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     modified_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     topic = db.Column(db.String(1000), default='Untitled', nullable=False)
     body = db.Column(db.String(1000), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     tags = db.relationship("Tag", secondary=lambda: postTags, lazy='dynamic')
+    revisions = db.relationship('Revision', backref='post', lazy='dynamic')
     is_deleted = db.Column(db.Boolean, default=False, nullable=False)
     attachments = db.relationship('Attachment', backref='post', lazy='dynamic')
     # TODO REFERENCES
