@@ -17,7 +17,10 @@ def api_root():
 
 @app.route('/upload', methods=['POST'])
 def upload():
+    """When a file is POSTed to this endpoint, it is given
+    a random name and a new Attachment object is saved.
 
+    """
     if not check_login():
         abort(401)
 
@@ -36,26 +39,31 @@ def upload():
     while True:
         filename = urlsafe_b64encode(os.urandom(30))
         try:
-            f = open(upload_dir + '/' + filename)
+            f = open('/'.join([upload_dir, filename]))
             continue
         except IOError:
-            f = open(upload_dir + '/' + filename, b'w')
+            f = open('/'.join([upload_dir, filename]), b'w')
             break
     uploaded_file.save(f)
 
-    attachment = m.Attachment(user_id=user_id,
-                              name=original_name,
-                              location=filename)
+    attachment = m.Attachment(
+        user_id=user_id,
+        name=original_name,
+        location=filename,
+    )
 
     m.db.session.add(attachment)
     try:
         m.db.session.commit()
-        response = jsonify(id=attachment.id,
-                           created_at=str(attachment.created_at),
-                           modified_at=str(attachment.modified_at),
-                           user_id=attachment.user_id,
-                           name=attachment.name,
-                           location=attachment.location)
     except IntegrityError:
-        abort(500)
+        abort(400)
+
+    response = jsonify(
+        id=attachment.id,
+        created_at=str(attachment.created_at),
+        modified_at=str(attachment.modified_at),
+        user_id=user_id,
+        name=attachment.name,
+        location=attachment.location,
+    )
     return response
