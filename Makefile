@@ -20,3 +20,6 @@ acceptance-test:
 
 app:
 	. bin/activate; WHATUPCONFIG=${CONFIG} python whatup_api/app.py
+
+coverage:
+	. bin/activate; WHATUPCONFIG=${CONFIG} nosetests --with-xunit --with-xcover
