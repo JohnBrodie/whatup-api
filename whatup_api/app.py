@@ -25,8 +25,8 @@ configure_error_handlers(app)
 @app.after_request
 def add_cors_headers(response):
     """Add headers needed to allow CORS requests."""
-    host = request.headers.get('Host', '*')
-    response.headers.add('Access-Control-Allow-Origin', host)
+    origin = request.headers.get('Origin', '*')
+    response.headers.add('Access-Control-Allow-Origin', origin)
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     response.headers.add('Access-Control-Allow-Methods',
                          'POST, GET, PUT, PATCH, DELETE, OPTIONS')
