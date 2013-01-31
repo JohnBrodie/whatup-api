@@ -19,9 +19,10 @@ def login():
             return open_id.try_login(oid, ask_for=['email', 'fullname',
                                                    'nickname'])
 
+    next_url = request.args.get('redir', open_id.get_next_url())
     return render_template(
         'login.html',
-        next=open_id.get_next_url(),
+        next=next_url,
         error=open_id.fetch_error(),
         providers=COMMON_PROVIDERS,
     )
