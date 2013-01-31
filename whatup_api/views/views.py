@@ -1,5 +1,5 @@
 import os
-from flask import request, abort, jsonify, g
+from flask import request, abort, jsonify, g, redirect
 from sqlalchemy.exc import IntegrityError
 
 from whatup_api.app import app
@@ -13,14 +13,15 @@ from whatup_api.helpers.app_helpers import (check_login,
 @app.route('/api', methods=['GET'])
 def api_root():
     """Redirect to API docs."""
-    return 'TODO: Replace with API Docs'
+    return redirect('http://projectwhatup.us')
+    #return 'TODO: Replace with API Docs'
 
 @app.route('/upload', methods=['POST'])
 def upload():
     """When a file is POSTed to this endpoint, it is given
     a random name and a new Attachment object is saved.
 
-    """ 
+    """
     if not check_login():
         abort(401)
 
