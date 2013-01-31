@@ -12,6 +12,8 @@ class UserData(DataSet):
         alias = 'xbonez'
         bio = 'Little is known about Ayush. He is an enigma.'
         is_deleted = False
+        email = 'enigma@ayush.me'
+        openid = 'openidkey'
 
     class SpecifiesNone:
         name = 'John Doe'

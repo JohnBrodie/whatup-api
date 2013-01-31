@@ -15,6 +15,8 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     modified_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     name = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(100))
+    openid = db.Column(db.String(255))
     alias = db.Column(db.String(255))
     bio = db.Column(db.String(255))
     subscriptions = db.relationship('Subscription', backref='owner',
