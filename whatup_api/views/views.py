@@ -17,7 +17,7 @@ def api_root():
     #return 'TODO: Replace with API Docs'
 
 
-@app.route('/check_login', methods['GET'])
+@app.route('/check_login', methods=['GET'])
 def is_logged_in():
     """Return true if user is logged in, else false."""
     is_logged_in = check_login()
