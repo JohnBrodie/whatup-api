@@ -101,6 +101,7 @@ def create_api(app):
         m.User,
         methods=ALL_HTTP_METHODS,
         exclude_columns=[
+            'openid',
             'is_deleted',
             'tags_created.is_deleted',
             'subscriptions.is_deleted',
@@ -174,7 +175,7 @@ def create_attachment_from_url(url, config):
         original_name = r.info()['Content-Disposition'].split('filename=')[1]
         if original_name[0] == '"' or original_name[0] == "'":
             original_name = original_name[1:-1]
-    elif r.url != url: 
+    elif r.url != url:
         original_name = basename(unquote(urlsplit(url)[2]))
 
     if ('content-length' in r.headers and
