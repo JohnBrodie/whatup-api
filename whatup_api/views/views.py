@@ -16,6 +16,13 @@ def api_root():
     return redirect('http://projectwhatup.us')
     #return 'TODO: Replace with API Docs'
 
+
+@app.route('/check_login', methods['GET'])
+def is_logged_in():
+    """Return true if user is logged in, else false."""
+    is_logged_in = check_login()
+    return jsonify(is_logged_in=is_logged_in)
+
 @app.route('/upload', methods=['POST'])
 def upload():
     """When a file is POSTed to this endpoint, it is given
