@@ -13,9 +13,9 @@ class RevisionData(DataSet):
         modified_at = datetime(2001, 10, 11)
         author = UserData.Default
         post = PostData.Default
-        body = "Lorem ipsum potateus frenchfrilius"
+        body = "Lorem ipsum"
 
     class SpecifiesNone:
         author = UserData.Default
         post = PostData.Default
-        body = "Lorem ipsum potateus frenchfrilius"
+        body = "Lorem ipsum"

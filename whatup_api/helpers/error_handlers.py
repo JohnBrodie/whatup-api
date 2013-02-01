@@ -12,7 +12,7 @@ def configure_error_handlers(app):
         return jsonify(error=e.message), 404
 
     @app.errorhandler(405)
-    def return_method_now_allowed_json(e):
+    def return_method_not_allowed_json(e):
         return jsonify(error=e.message), 405
 
     @app.errorhandler(500)

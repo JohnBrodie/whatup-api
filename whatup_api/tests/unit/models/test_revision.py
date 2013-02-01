@@ -25,8 +25,8 @@ class DescribeRevisionModel(RevisionModelTestCase):
     def should_have_non_nullable_user(self):
         self.assertFalse(self.is_nullable('user_id'))
 
-    def should_have_non_nullable_post(self):
-        self.assertFalse(self.is_nullable('post_id'))
+    def should_have_nullable_post(self):
+        self.assertTrue(self.is_nullable('post_id'))
 
     def should_have_post(self):
         post = self.Default.post

@@ -53,7 +53,6 @@ class WhenCreatingInvalidPost(_FunctionalTestCase):
     def should_return_validation_error(self):
         self.assertTrue('validation_errors' in self.json)
 
-
 class WhenDeletingPosts(_FunctionalTestCase):
 
     expected_status = 204
@@ -85,6 +84,32 @@ class WhenEditingPosts(_FunctionalTestCase):
     def should_return_edited_post_data(self):
         self.assertEqual(self.put_data['body'], self.json['body'])
 
+    def should_return_latest_revision(self):
+        revisions = self.json['revisions']
+        latestRevision = None
+        for revision in revisions:
+            if latestRevision is None or revision['id'] > latestRevision['id']:
+                latestRevision = revision
+        self.assertEqual(self.put_data['body'], latestRevision['body'])
+
+class WhenSupplyingBodyAndRevId(_FunctionalTestCase):
+    endpoint = '/api/posts/1'
+    expected_status = 400
+    put_data = {'body': 'bodybody', 'rev_id': 1}
+
+class WhenRevertingToOldPost(_FunctionalTestCase):
+    endpoint = '/api/posts/1'
+    expected_status = 200
+    put_data = {'rev_id': 1}
+
+    def should_have_updated_body(self):
+        revision = m.Revision.query.get(1)
+        self.assertEqual(revision.body, self.json['body'])
+
+class WhenRevertingToBodyBelongingToDiffPost(_FunctionalTestCase):
+    endpoint = '/api/posts/2'
+    expected_status = 400
+    put_data = {'rev_id': 1}
 
 class WhenEditingPostWithInvalidID(_FunctionalTestCase):
 

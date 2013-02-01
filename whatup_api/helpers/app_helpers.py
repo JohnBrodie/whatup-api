@@ -8,7 +8,7 @@ from urllib import unquote
 from os.path import basename
 from urlparse import urlsplit
 from ConfigParser import NoSectionError
-from flask import g, session
+from flask import abort, g, session
 from flask.ext.restless import APIManager
 from os import environ
 from sqlalchemy.exc import (
@@ -20,7 +20,6 @@ from sqlalchemy.exc import (
 from whatup_api import prod_config
 from whatup_api import models as m
 from whatup_api.exceptions import APIError
-
 
 def check_login():
     """Check if user has openid key in their session,
@@ -71,6 +70,57 @@ def add_user_to_request(post_data):
     post_data['user_id'] = g.user.id
     return post_data
 
+def add_revision_and_user_to_post(post_data):
+    """ Adds a revision to post data 
+    before passing the request on to the model.
+
+    """
+    if not check_login():
+        return post_data
+    add_user_to_request(post_data)
+    if post_data.get('body') is not None:
+        revision = m.Revision(user_id = post_data['user_id'], body = post_data['body']) 
+        m.db.session.add(revision)
+        m.db.session.commit()
+        post_data['revisions'] = [{'id' : revision.id}]
+    return post_data
+
+def handle_revision_updates(put_data, instid):
+    if not check_login():
+        put_data.pop('rev_id', None)
+        return put_data
+    if 'body' not in put_data and 'rev_id' not in put_data:
+        return put_data
+    if 'body' in put_data and 'rev_id' in put_data:
+        abort(500)
+    post = m.Post.query.get(instid)
+    if post is None:
+        put_data.pop('rev_id', None)
+        return put_data
+
+    if 'body' in put_data:
+        if put_data['body'] is None:
+            return put_data
+        if put_data['body'] == post.body:
+            put_data.pop('body', None)
+            return put_data
+        revision = m.Revision(user_id = g.user.id, body = put_data['body']) 
+    elif 'rev_id' in put_data:
+        rev = m.Revision.query.get(put_data['rev_id'])
+        if rev is None:
+            put_data.pop('rev_id', None)
+            return put_data
+        if rev not in post.revisions:
+            abort(500)
+        put_data.pop('rev_id', None)
+        revision = m.Revision(user_id = g.user.id, post_id = post.id, body = rev.body)
+
+    if revision is not None: 
+        post.revisions.append(revision)
+        m.db.session.add(revision)
+        m.db.session.commit()
+        put_data['body'] = revision.body
+    return put_data
 
 def create_api(app):
     """ Use Flask-Restless to create API endpoints based on
@@ -96,7 +146,8 @@ def create_api(app):
         authentication_required_for=ALL_HTTP_METHODS,
         authentication_function=check_login,
         validation_exceptions=validation_exceptions,
-        post_form_preprocessor=add_user_to_request,
+        post_form_preprocessor=add_revision_and_user_to_post,
+        put_form_preprocessor=handle_revision_updates
     )
     manager.create_api(
         m.User,
