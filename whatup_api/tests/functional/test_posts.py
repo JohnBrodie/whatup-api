@@ -86,14 +86,13 @@ class WhenEditingPosts(_FunctionalTestCase):
         self.assertEqual(self.put_data['body'], self.json['body'])
 
 
-# TODO this breaks flask-restless
-#class WhenEditingPostWithInvalidID(_FunctionalTestCase):
-#
-#    endpoint = '/api/posts/999'
-#    expected_status = 404
-#    expected_content_type = 'text/html'
-#    put_data = {'body': 'new body here',
-#                'tags': []}
-#
-#    def should_return_html_notice(self):
-#        assert '<title>404 Not Found</title>' in self.response.data
+class WhenEditingPostWithInvalidID(_FunctionalTestCase):
+
+    endpoint = '/api/posts/999'
+    expected_status = 404
+    expected_content_type = 'application/json'
+    put_data = {'body': 'new body here',
+                'tags': []}
+
+    def should_return_404(self):
+        self.assertEqual(self.json['error'], '404 Not Found')

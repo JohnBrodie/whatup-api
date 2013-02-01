@@ -91,13 +91,12 @@ class WhenEditingSubscriptions(_FunctionalTestCase):
         self.assertEqual(self.put_data['user'], self.json['user'])
 
 
-# TODO this breaks flask-restless
-#class WhenEditingSubscriptionWithInvalidID(_FunctionalTestCase):
-#
-#    endpoint = '/api/subscriptions/999'
-#    expected_status = 404
-#    expected_content_type = 'text/html'
-#    put_data = {'bio': 'new bio here'}
-#
-#    def should_return_html_notice(self):
-#        assert '<title>404 Not Found</title>' in self.response.data
+class WhenEditingSubscriptionWithInvalidID(_FunctionalTestCase):
+
+    endpoint = '/api/subscriptions/999'
+    expected_status = 404
+    expected_content_type = 'application/json'
+    put_data = {'user': 2}
+
+    def should_return_404(self):
+        self.assertEqual(self.json['error'], '404 Not Found')
