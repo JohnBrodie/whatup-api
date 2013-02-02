@@ -119,8 +119,11 @@ def handle_revision_updates(put_data, instid):
 
     if revision is not None: 
         post.revisions.append(revision)
-        m.db.session.add(revision)
-        m.db.session.commit()
+        try:
+            m.db.session.add(revision)
+            m.db.session.commit()
+        except IntegrityError:
+            abort(400)
         put_data['body'] = revision.body
     return put_data
 

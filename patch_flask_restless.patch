@@ -1,72 +1,143 @@
+Only in lib/python2.7/site-packages/flask_restless: helpers.pyc
+Only in lib/python2.7/site-packages/flask_restless: __init__.pyc
 diff -crB lib/python2.7/site-packages/flask_restless/manager.py lib/python2.7/site-packages/flask_restless2/manager.py
-*** lib/python2.7/site-packages/flask_restless/manager.py	2013-01-31 22:38:09.000000000 -0500
---- lib/python2.7/site-packages/flask_restless2/manager.py	2013-01-31 22:47:46.698234230 -0500
+*** lib/python2.7/site-packages/flask_restless/manager.py	2013-02-02 15:00:45.000000000 -0500
+--- lib/python2.7/site-packages/flask_restless2/manager.py	2013-02-02 15:01:25.746406976 -0500
 ***************
-*** 195,201 ****
-                               authentication_function=None,
+*** 193,199 ****
                                exclude_columns=None, include_columns=None,
                                validation_exceptions=None, results_per_page=10,
+                               max_results_per_page=100,
 !                              post_form_preprocessor=None):
           """Creates an returns a ReSTful API interface as a blueprint, but does
           not register it on any :class:`flask.Flask` application.
   
---- 195,202 ----
-                               authentication_function=None,
+--- 193,200 ----
                                exclude_columns=None, include_columns=None,
                                validation_exceptions=None, results_per_page=10,
+                               max_results_per_page=100,
 !                              post_form_preprocessor=None,
 !                              put_form_preprocessor=None):
           """Creates an returns a ReSTful API interface as a blueprint, but does
           not register it on any :class:`flask.Flask` application.
   
 ***************
-*** 359,365 ****
-                                 authentication_required_for,
+*** 366,372 ****
                                  authentication_function, exclude_columns,
                                  include_columns, validation_exceptions,
-!                                results_per_page, post_form_preprocessor)
+                                 results_per_page, max_results_per_page,
+!                                post_form_preprocessor)
           # suffix an integer to apiname according to already existing blueprints
           blueprintname = self._next_blueprint_name(apiname)
           # add the URL rules to the blueprint: the first is for methods on the
---- 360,367 ----
-                                 authentication_required_for,
+--- 367,373 ----
                                  authentication_function, exclude_columns,
                                  include_columns, validation_exceptions,
-!                                results_per_page, post_form_preprocessor, 
-!                                put_form_preprocessor)
+                                 results_per_page, max_results_per_page,
+!                                post_form_preprocessor, put_form_preprocessor)
           # suffix an integer to apiname according to already existing blueprints
           blueprintname = self._next_blueprint_name(apiname)
           # add the URL rules to the blueprint: the first is for methods on the
+Only in lib/python2.7/site-packages/flask_restless: manager.pyc
 diff -crB lib/python2.7/site-packages/flask_restless/search.py lib/python2.7/site-packages/flask_restless2/search.py
-*** lib/python2.7/site-packages/flask_restless/search.py	2013-01-31 22:38:09.000000000 -0500
---- lib/python2.7/site-packages/flask_restless2/search.py	2013-01-31 22:47:46.814234233 -0500
+*** lib/python2.7/site-packages/flask_restless/search.py	2013-02-02 15:00:45.000000000 -0500
+--- lib/python2.7/site-packages/flask_restless2/search.py	2013-02-02 15:01:25.746406976 -0500
 ***************
-*** 155,193 ****
+*** 156,161 ****
+--- 156,228 ----
           otherfield = dictionary.get('field')
           return Filter(fieldname, operator, argument, otherfield)
   
++ class Disjunction(object):
++     """Represents a disjunction to apply to a SQL query.
++ 
++     A disjunction can be, for example, a comparison operator applied to a field of a
++     model and a value or a comparison applied to two fields of the same
++     model. For more information on possible disjunctions, see :ref:`search`.
++ 
++     """
++ 
++     def __init__(self, fieldname, operator, argument=None, otherfield=None):
++         """Instantiates this object with the specified attributes.
++ 
++         `fieldname` is the name of the field of a model which will be on the
++         left side of the operator.
++ 
++         `operator` is the string representation of an operator to apply. The
++         full list of recognized operators can be found at :ref:`search`.
++ 
++         If `argument` is specified, it is the value to place on the right side
++         of the operator. If `otherfield` is specified, that field on the model
++         will be placed on the right side of the operator.
++ 
++         .. admonition:: About `argument` and `otherfield`
++ 
++            Some operators don't need either argument and some need exactly one.
++            However, this constructor will not raise any errors or otherwise
++            inform you of which situation you are in; it is basically just a
++            named tuple. Calling code must handle errors caused by missing
++            required arguments.
++ 
++         """
++         self.fieldname = fieldname
++         self.operator = operator
++         self.argument = argument
++         self.otherfield = otherfield
++ 
++     def __repr__(self):
++         """Returns a string representation of this object."""
++         return '<Disjunction {} {} {}>'.format(self.fieldname, self.operator,
++                                           self.argument or self.otherfield)
++ 
++     @staticmethod
++     def from_dictionary(dictionary):
++         """Returns a new :class:`Disjunction` object with arguments parsed from
++         `dictionary`.
++ 
++         `dictionary` is a dictionary of the form::
++ 
++             {'name': 'age', 'op': 'lt', 'val': 20}
++ 
++         or::
++ 
++             {'name': 'age', 'op': 'lt', 'other': height}
++ 
++         where ``dictionary['name']`` is the name of the field of the model on
++         which to apply the operator, ``dictionary['op']`` is the name of the
++         operator to apply, ``dictionary['val']`` is the value on the right to
++         which the operator will be applied, and ``dictionary['other']`` is the
++         name of the other field of the model to which the operator will be
++         applied.
++ 
++         """
++         fieldname = dictionary.get('name')
++         operator = dictionary.get('op')
++         argument = dictionary.get('val')
++         otherfield = dictionary.get('field')
++         return Disjunction(fieldname, operator, argument, otherfield)
   
-! class SearchParameters(object):
-!     """Aggregates the parameters for a search, including filters, search type,
-!     limit, offset, and order by directives.
+  class SearchParameters(object):
+      """Aggregates the parameters for a search, including filters, search type,
+***************
+*** 163,169 ****
   
       """
   
 !     def __init__(self, filters=None, limit=None, offset=None, order_by=None):
           """Instantiates this object with the specified attributes.
   
-!         `filters` is a list of :class:`Filter` objects, representing filters to
-!         be applied during the search.
+          `filters` is a list of :class:`Filter` objects, representing filters to
+--- 230,236 ----
   
-!         `limit`, if not ``None``, specifies the maximum number of results to
-!         return in the search.
+      """
   
-!         `offset`, if not ``None``, specifies the number of initial results to
-!         skip in the result set.
+!     def __init__(self, filters=None, disjunctions=None, limit=None, offset=None, order_by=None):
+          """Instantiates this object with the specified attributes.
   
-!         `order_by` is a list of :class:`OrderBy` objects, representing the
-!         ordering directives to apply to the result set which matches the
-!         search.
+          `filters` is a list of :class:`Filter` objects, representing filters to
+***************
+*** 180,194 ****
+          search.
   
           """
           self.filters = filters or []
@@ -81,88 +152,15 @@ diff -crB lib/python2.7/site-packages/flask_restless/search.py lib/python2.7/sit
                                         self.offset)
   
       @staticmethod
---- 155,249 ----
-          otherfield = dictionary.get('field')
-          return Filter(fieldname, operator, argument, otherfield)
+--- 247,268 ----
+          search.
   
-+ class Disjunction(object):
-+     """Represents a disjunction to apply to a SQL query.
-  
-!     A disjunction can be, for example, a comparison operator applied to a field of a
-!     model and a value or a comparison applied to two fields of the same
-!     model. For more information on possible disjunctions, see :ref:`search`.
-  
-      """
-  
-!     def __init__(self, fieldname, operator, argument=None, otherfield=None):
-          """Instantiates this object with the specified attributes.
-  
-!         `fieldname` is the name of the field of a model which will be on the
-!         left side of the operator.
-! 
-!         `operator` is the string representation of an operator to apply. The
-!         full list of recognized operators can be found at :ref:`search`.
-! 
-!         If `argument` is specified, it is the value to place on the right side
-!         of the operator. If `otherfield` is specified, that field on the model
-!         will be placed on the right side of the operator.
-! 
-!         .. admonition:: About `argument` and `otherfield`
-! 
-!            Some operators don't need either argument and some need exactly one.
-!            However, this constructor will not raise any errors or otherwise
-!            inform you of which situation you are in; it is basically just a
-!            named tuple. Calling code must handle errors caused by missing
-!            required arguments.
-! 
-!         """
-!         self.fieldname = fieldname
-!         self.operator = operator
-!         self.argument = argument
-!         self.otherfield = otherfield
-! 
-!     def __repr__(self):
-!         """Returns a string representation of this object."""
-!         return '<Disjunction {} {} {}>'.format(self.fieldname, self.operator,
-!                                           self.argument or self.otherfield)
-! 
-!     @staticmethod
-!     def from_dictionary(dictionary):
-!         """Returns a new :class:`Disjunction` object with arguments parsed from
-!         `dictionary`.
-! 
-!         `dictionary` is a dictionary of the form::
-! 
-!             {'name': 'age', 'op': 'lt', 'val': 20}
-! 
-!         or::
-! 
-!             {'name': 'age', 'op': 'lt', 'other': height}
-  
-!         where ``dictionary['name']`` is the name of the field of the model on
-!         which to apply the operator, ``dictionary['op']`` is the name of the
-!         operator to apply, ``dictionary['val']`` is the value on the right to
-!         which the operator will be applied, and ``dictionary['other']`` is the
-!         name of the other field of the model to which the operator will be
-!         applied.
-  
-!         """
-!         fieldname = dictionary.get('name')
-!         operator = dictionary.get('op')
-!         argument = dictionary.get('val')
-!         otherfield = dictionary.get('field')
-!         return Disjunction(fieldname, operator, argument, otherfield)
-  
-! class SearchParameters(object):
-!     """Aggregates the parameters for a search, including filters, search type,
-!     limit, offset, and order by directives.
-  
-+     """
-+     def __init__(self, filters=None, disjunctions=None, limit=None, offset=None, order_by=None):
+          """
++ 
 +         """ Patch restless SearchParameters object to
 +         always exclude is_deleted rows.
 +     
-          """
++         """
           self.filters = filters or []
 +         self.disjunctions = disjunctions or []
 +         self.filters.append(Filter("is_deleted", "neq", 1))
@@ -178,22 +176,8 @@ diff -crB lib/python2.7/site-packages/flask_restless/search.py lib/python2.7/sit
   
       @staticmethod
 ***************
-*** 218,231 ****
-          # for the sake of brevity...
-          from_dict = Filter.from_dictionary
-          filters = [from_dict(f) for f in dictionary.get('filters', [])]
-          # HACK In Python 2.5, unicode dictionary keys are not allowed.
-          order_by_list = dictionary.get('order_by', [])
-          order_by_list = (unicode_keys_to_strings(o) for o in order_by_list)
-          order_by = [OrderBy(**o) for o in order_by_list]
-          limit = dictionary.get('limit')
-          offset = dictionary.get('offset')
-!         return SearchParameters(filters=filters, limit=limit, offset=offset,
-!                                 order_by=order_by)
-  
-  
-  class QueryBuilder(object):
---- 274,288 ----
+*** 219,224 ****
+--- 293,300 ----
           # for the sake of brevity...
           from_dict = Filter.from_dictionary
           filters = [from_dict(f) for f in dictionary.get('filters', [])]
@@ -202,16 +186,26 @@ diff -crB lib/python2.7/site-packages/flask_restless/search.py lib/python2.7/sit
           # HACK In Python 2.5, unicode dictionary keys are not allowed.
           order_by_list = dictionary.get('order_by', [])
           order_by_list = (unicode_keys_to_strings(o) for o in order_by_list)
-          order_by = [OrderBy(**o) for o in order_by_list]
+***************
+*** 226,232 ****
           limit = dictionary.get('limit')
           offset = dictionary.get('offset')
-!         return SearchParameters(filters=filters, disjunctions=disjunctions, limit=limit, offset=offset, order_by=order_by)
+          return SearchParameters(filters=filters, limit=limit, offset=offset,
+!                                 order_by=order_by)
+  
+  
+  class QueryBuilder(object):
+--- 302,308 ----
+          limit = dictionary.get('limit')
+          offset = dictionary.get('offset')
+          return SearchParameters(filters=filters, limit=limit, offset=offset,
+!                                 order_by=order_by, disjunctions=disjunctions)
   
   
   class QueryBuilder(object):
 ***************
-*** 328,333 ****
---- 385,450 ----
+*** 329,334 ****
+--- 405,470 ----
           return filters
   
       @staticmethod
@@ -279,29 +273,12 @@ diff -crB lib/python2.7/site-packages/flask_restless/search.py lib/python2.7/sit
           """Builds an SQLAlchemy query instance based on the search parameters
           present in ``search_params``, an instance of :class:`SearchParameters`.
 ***************
-*** 352,363 ****
-  
-          """
-          # Adding field filters
--         query = session.query(model)
-          # may raise exception here
-          filters = QueryBuilder._create_filters(model, search_params)
-          for filt in filters:
-              query = query.filter(filt)
-  
-          # Order the search
-          for val in search_params.order_by:
-              field = getattr(model, val.field)
---- 469,490 ----
-  
-          """
-          # Adding field filters
+*** 356,364 ****
+--- 492,508 ----
+          query = session.query(model)
           # may raise exception here
           filters = QueryBuilder._create_filters(model, search_params)
 +         disjunctions = QueryBuilder._create_disjunctions(model, search_params)
-+ 
-+         query = session.query(model)
-+ 
           for filt in filters:
               query = query.filter(filt)
   
@@ -315,67 +292,39 @@ diff -crB lib/python2.7/site-packages/flask_restless/search.py lib/python2.7/sit
           # Order the search
           for val in search_params.order_by:
               field = getattr(model, val.field)
+Only in lib/python2.7/site-packages/flask_restless: search.pyc
 diff -crB lib/python2.7/site-packages/flask_restless/views.py lib/python2.7/site-packages/flask_restless2/views.py
-*** lib/python2.7/site-packages/flask_restless/views.py	2013-01-31 22:38:09.000000000 -0500
---- lib/python2.7/site-packages/flask_restless2/views.py	2013-01-31 22:47:46.822234233 -0500
+*** lib/python2.7/site-packages/flask_restless/views.py	2013-02-02 15:00:45.000000000 -0500
+--- lib/python2.7/site-packages/flask_restless2/views.py	2013-02-02 15:01:25.750406976 -0500
 ***************
-*** 465,472 ****
-      def __init__(self, session, model, authentication_required_for=None,
+*** 463,469 ****
                    authentication_function=None, exclude_columns=None,
                    include_columns=None, validation_exceptions=None,
-!                  results_per_page=10, post_form_preprocessor=None, *args,
-!                  **kw):
+                   results_per_page=10, max_results_per_page=100,
+!                  post_form_preprocessor=None, *args, **kw):
           """Instantiates this view with the specified attributes.
   
           `session` is the SQLAlchemy session in which all database transactions
---- 465,472 ----
-      def __init__(self, session, model, authentication_required_for=None,
+--- 463,469 ----
                    authentication_function=None, exclude_columns=None,
                    include_columns=None, validation_exceptions=None,
-!                  results_per_page=10, post_form_preprocessor=None, 
-!                  put_form_preprocessor=None, *args, **kw):
+                   results_per_page=10, max_results_per_page=100,
+!                  post_form_preprocessor=None, put_form_preprocessor=None, *args, **kw):
           """Instantiates this view with the specified attributes.
   
           `session` is the SQLAlchemy session in which all database transactions
 ***************
-*** 558,563 ****
---- 558,564 ----
-          self.paginate = (isinstance(self.results_per_page, int)
-                           and self.results_per_page > 0)
+*** 562,567 ****
+--- 562,568 ----
+          self.results_per_page = results_per_page
+          self.max_results_per_page = max_results_per_page
           self.post_form_preprocessor = post_form_preprocessor
 +         self.put_form_preprocessor = put_form_preprocessor
   
       def _add_to_relation(self, query, relationname, toadd=None):
           """Adds a new or existing related model to each model specified by
 ***************
-*** 668,677 ****
-          relations = _get_relations(self.model)
-          tochange = frozenset(relations) & frozenset(params)
-          for columnname in tochange:
-!             toadd = params[columnname].get('add', [])
-!             toremove = params[columnname].get('remove', [])
-!             self._add_to_relation(query, columnname, toadd=toadd)
-!             self._remove_from_relation(query, columnname, toremove=toremove)
-          return tochange
-  
-      def _handle_validation_exception(self, exception):
---- 669,682 ----
-          relations = _get_relations(self.model)
-          tochange = frozenset(relations) & frozenset(params)
-          for columnname in tochange:
-!             if isinstance(params[columnname], list):
-!                 toset = params[columnname]
-!                 self._set_on_relation(query, columnname, toset=toset)
-!             else:
-!                 toadd = params[columnname].get('add', [])
-!                 toremove = params[columnname].get('remove', [])
-!                 self._add_to_relation(query, columnname, toadd=toadd)
-!                 self._remove_from_relation(query, columnname, toremove=toremove)
-          return tochange
-  
-      def _handle_validation_exception(self, exception):
-***************
-*** 957,974 ****
+*** 1025,1042 ****
           return jsonify(result)
   
       def delete(self, instid):
@@ -394,7 +343,7 @@ diff -crB lib/python2.7/site-packages/flask_restless/views.py lib/python2.7/site
               self.session.commit()
           return jsonify_status_code(204)
   
---- 962,971 ----
+--- 1025,1034 ----
           return jsonify(result)
   
       def delete(self, instid):
@@ -406,54 +355,15 @@ diff -crB lib/python2.7/site-packages/flask_restless/views.py lib/python2.7/site
           return jsonify_status_code(204)
   
 ***************
-*** 1074,1079 ****
---- 1073,1081 ----
-              # this also happens when request.data is empty
+*** 1147,1152 ****
+--- 1139,1147 ----
               return jsonify_status_code(400, message='Unable to decode data')
-  
+          # Check for any request parameter naming a column which does not exist
+          # on the current model.
 +         if self.put_form_preprocessor:
 +             data = self.put_form_preprocessor(data, instid)
 + 
-          patchmany = instid is None
-          if patchmany:
-              try:
-***************
-*** 1115,1117 ****
---- 1117,1153 ----
-      def put(self, instid):
-          """Alias for :meth:`patch`."""
-          return self.patch(instid)
-+     
-+     def _set_on_relation(self, query, relationname, toset=None):
-+         """Sets the value of the relation specified by `relationname` on each
-+         instance specified by `query` to have the new or existing related
-+         models specified by `toset`.
-+         
-+         This function does not commit the changes made to the database. The
-+         calling function has that responsibility.
-+         
-+         `query` is a SQLAlchemy query instance that evaluates to all instances
-+         of the model specified in the constructor of this class that should be
-+         updated.
-+         
-+         `relationname` is the name of a one-to-many relationship which exists
-+         on each model specified in `query`.
-+         
-+         `toset` is a list of dictionaries, each representing the attributes of
-+         an existing or new related model to set. If a dictionary contains the
-+         key ``'id'``, that instance of the related model will be added.
-+         Otherwise, the :classmethod:`~flask.ext.restless.model.get_or_create`
-+         class method will be used to get or create a model to set.
-+         
-+         """
-+         submodel = _get_related_model(self.model, relationname)
-+         subinst_list = []
-+         for dictionary in toset or []:
-+             if 'id' in dictionary:
-+                 subinst = self._get_by(dictionary['id'], submodel)
-+             else:
-+                 kw = unicode_keys_to_strings(dictionary)
-+                 subinst = _get_or_create(self.session, submodel, **kw)[0]
-+             subinst_list.append(subinst)
-+         for instance in query:
-+             setattr(instance, relationname, subinst_list)
+          for field in data:
+              if not hasattr(self.model, field):
+                  msg = "Model does not have field '%s'" % field
+Only in lib/python2.7/site-packages/flask_restless: views.pyc
