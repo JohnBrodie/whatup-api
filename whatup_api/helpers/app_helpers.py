@@ -76,19 +76,21 @@ def add_revision_and_user_to_post(post_data):
 
     """
     if not check_login():
-        return post_data
+        abort(401)
     add_user_to_request(post_data)
     if post_data.get('body') is not None:
         revision = m.Revision(user_id = post_data['user_id'], body = post_data['body']) 
-        m.db.session.add(revision)
-        m.db.session.commit()
+        try:
+            m.db.session.add(revision)
+            m.db.session.commit()
+        except IntegrityError:
+            abort(400)
         post_data['revisions'] = [{'id' : revision.id}]
     return post_data
 
 def handle_revision_updates(put_data, instid):
     if not check_login():
-        put_data.pop('rev_id', None)
-        return put_data
+        abort(401)
     if 'body' not in put_data and 'rev_id' not in put_data:
         return put_data
     if 'body' in put_data and 'rev_id' in put_data:
