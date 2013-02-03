@@ -1,13 +1,14 @@
-import os
-from flask import request, abort, jsonify, g, redirect
+from flask import request, abort, jsonify, redirect
 from sqlalchemy.exc import IntegrityError
 
 from whatup_api.app import app
 from whatup_api import models as m
-from whatup_api.helpers.app_helpers import (check_login,
-                                        get_new_attachment_filename,
-                                        create_attachment_from_url,
-                                        create_attachment_from_file)
+from whatup_api.helpers.app_helpers import (
+    check_login,
+    create_attachment_from_url,
+    create_attachment_from_file
+)
+
 
 @app.route('/', methods=['GET'])
 @app.route('/api', methods=['GET'])
@@ -23,6 +24,7 @@ def is_logged_in():
     is_logged_in = check_login()
     return jsonify(is_logged_in=is_logged_in)
 
+
 @app.route('/upload', methods=['POST'])
 def upload():
     """When a file is POSTed to this endpoint, it is given
@@ -33,10 +35,16 @@ def upload():
         abort(401)
 
     if len(request.files):
-        attachment = create_attachment_from_file(request.files['file'], app.config)
+        attachment = create_attachment_from_file(
+            request.files['file'],
+            app.config
+        )
     elif 'url' in request.form:
         try:
-            attachment = create_attachment_from_url(request.form['url'], app.config)
+            attachment = create_attachment_from_url(
+                request.form['url'],
+                app.config
+            )
         except IOError:
             return jsonify(error='Failed to download file'), 400
         except ValueError:

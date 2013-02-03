@@ -21,6 +21,7 @@ from whatup_api import prod_config
 from whatup_api import models as m
 from whatup_api.exceptions import APIError
 
+
 def check_login():
     """Check if user has openid key in their session,
     and if that key is registered with us. This function
@@ -70,6 +71,7 @@ def add_user_to_request(post_data):
     post_data['user_id'] = g.user.id
     return post_data
 
+
 def handle_revision_updates(put_data, instid):
     if not check_login():
         abort(401)
@@ -88,7 +90,7 @@ def handle_revision_updates(put_data, instid):
         if put_data['body'] == post.body:
             put_data.pop('body', None)
             return put_data
-        revision = m.Revision(user_id = g.user.id, body = post.body) 
+        revision = m.Revision(user_id=g.user.id, body=post.body)
     elif 'rev_id' in put_data:
         rev = m.Revision.query.get(put_data['rev_id'])
         put_data.pop('rev_id', None)
@@ -97,9 +99,13 @@ def handle_revision_updates(put_data, instid):
         if rev not in post.revisions:
             abort(500)
         put_data['body'] = rev.body
-        revision = m.Revision(user_id = g.user.id, post_id = post.id, body = post.body)
+        revision = m.Revision(
+            user_id=g.user.id,
+            post_id=post.id,
+            body=post.body
+        )
 
-    if revision is not None: 
+    if revision is not None:
         put_data.pop('revisions', None)
         post.revisions.append(revision)
         try:
@@ -108,6 +114,7 @@ def handle_revision_updates(put_data, instid):
         except IntegrityError:
             abort(400)
     return put_data
+
 
 def create_api(app):
     """ Use Flask-Restless to create API endpoints based on
@@ -177,6 +184,7 @@ def create_api(app):
         post_form_preprocessor=add_user_to_request,
     )
 
+
 def get_new_attachment_filename(config):
     upload_dir = config['ATTACHMENTS_DIR']
     while True:
@@ -187,6 +195,7 @@ def get_new_attachment_filename(config):
         except IOError:
             break
     return filename
+
 
 def create_attachment_from_file(uploaded_file, config):
     upload_dir = config['ATTACHMENTS_DIR']
@@ -204,6 +213,7 @@ def create_attachment_from_file(uploaded_file, config):
         location=filename,
     )
 
+
 def create_attachment_from_url(url, config):
     max_file_size = config['MAX_CONTENT_LENGTH']
     upload_dir = config['ATTACHMENTS_DIR']
@@ -211,7 +221,7 @@ def create_attachment_from_url(url, config):
         os.makedirs(upload_dir)
     original_name = basename(unquote(urlsplit(url)[2]))
     r = urlopen(url)
-    if r.info().has_key('Content-Disposition'):
+    if 'Content-Disposition' in r.info():
         original_name = r.info()['Content-Disposition'].split('filename=')[1]
         if original_name[0] == '"' or original_name[0] == "'":
             original_name = original_name[1:-1]
