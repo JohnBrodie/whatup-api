@@ -118,6 +118,7 @@ def handle_revision_updates(put_data, instid):
         revision = m.Revision(user_id = g.user.id, post_id = post.id, body = rev.body)
 
     if revision is not None: 
+        put_data.pop('revisions', None)
         post.revisions.append(revision)
         try:
             m.db.session.add(revision)
