@@ -39,8 +39,7 @@ class WhenCreatingValidPost(_FunctionalTestCase):
         self.assertEquals(self.new_id, self.json['id'])
 
     def should_create_post(self):
-        new_post = self.db.session.query(m.Post) \
-            .filter_by(id=self.new_id).one()
+        new_post = self.db.session.query(m.Post).get(self.new_id)
         self.assertIsNotNone(new_post)
 
 
@@ -65,8 +64,7 @@ class WhenDeletingPosts(_FunctionalTestCase):
         self.assertEqual(query.count(), 1)
 
     def should_set_is_deleted(self):
-        query = self.db.session.query(m.Post) \
-            .filter_by(id=1).one()
+        query = self.db.session.query(m.Post).get(1)
         self.assertEqual(query.is_deleted, True)
 
     def should_not_return_deleted(self):
@@ -80,17 +78,18 @@ class WhenEditingPosts(_FunctionalTestCase):
     expected_status = 200
     put_data = {'body': 'new body here',
                 'tags': []}
+    orig_post = 'body goes here'
 
     def should_return_edited_post_data(self):
         self.assertEqual(self.put_data['body'], self.json['body'])
 
-    def should_return_latest_revision(self):
+    def should_return_old_revision(self):
         revisions = self.json['revisions']
         latestRevision = None
         for revision in revisions:
             if latestRevision is None or revision['id'] > latestRevision['id']:
                 latestRevision = revision
-        self.assertEqual(self.put_data['body'], latestRevision['body'])
+        self.assertEqual(self.orig_post, latestRevision['body'])
 
 class WhenSupplyingBodyAndRevId(_FunctionalTestCase):
     endpoint = '/api/posts/1'

@@ -70,24 +70,6 @@ def add_user_to_request(post_data):
     post_data['user_id'] = g.user.id
     return post_data
 
-def add_revision_and_user_to_post(post_data):
-    """ Adds a revision to post data 
-    before passing the request on to the model.
-
-    """
-    if not check_login():
-        abort(401)
-    add_user_to_request(post_data)
-    if post_data.get('body') is not None:
-        revision = m.Revision(user_id = post_data['user_id'], body = post_data['body']) 
-        try:
-            m.db.session.add(revision)
-            m.db.session.commit()
-        except IntegrityError:
-            abort(400)
-        post_data['revisions'] = [{'id' : revision.id}]
-    return post_data
-
 def handle_revision_updates(put_data, instid):
     if not check_login():
         abort(401)
@@ -106,16 +88,16 @@ def handle_revision_updates(put_data, instid):
         if put_data['body'] == post.body:
             put_data.pop('body', None)
             return put_data
-        revision = m.Revision(user_id = g.user.id, body = put_data['body']) 
+        revision = m.Revision(user_id = g.user.id, body = post.body) 
     elif 'rev_id' in put_data:
         rev = m.Revision.query.get(put_data['rev_id'])
+        put_data.pop('rev_id', None)
         if rev is None:
-            put_data.pop('rev_id', None)
             return put_data
         if rev not in post.revisions:
             abort(500)
-        put_data.pop('rev_id', None)
-        revision = m.Revision(user_id = g.user.id, post_id = post.id, body = rev.body)
+        put_data['body'] = rev.body
+        revision = m.Revision(user_id = g.user.id, post_id = post.id, body = post.body)
 
     if revision is not None: 
         put_data.pop('revisions', None)
@@ -125,7 +107,6 @@ def handle_revision_updates(put_data, instid):
             m.db.session.commit()
         except IntegrityError:
             abort(400)
-        put_data['body'] = revision.body
     return put_data
 
 def create_api(app):
@@ -152,7 +133,7 @@ def create_api(app):
         authentication_required_for=ALL_HTTP_METHODS,
         authentication_function=check_login,
         validation_exceptions=validation_exceptions,
-        post_form_preprocessor=add_revision_and_user_to_post,
+        post_form_preprocessor=add_user_to_request,
         put_form_preprocessor=handle_revision_updates
     )
     manager.create_api(
