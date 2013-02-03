@@ -23,22 +23,24 @@ try:
     fromaddr = config.get('Required', 'from_addr')
     password = config.get('Required', 'password')
     post_id = config.get('Required', 'post_id')
+    session = config.get('Required', 'session')
 
 except ConfigParser.NoOptionError, error:
     print error
     sys.exit(4)
 
 # Get Current post
+cookies = {'session': session}
 headers = {'content-type': 'application/json'}
 current_post_url = '{0}/{1}'.format(base_address, post_id)
-resp = requests.get(current_post_url, headers=headers)
+resp = requests.get(current_post_url, headers=headers, cookies=cookies)
 post_text = resp.json()['body']
 
 current_post_view_url = '{0}{1}'.format(base_view_address, post_id)
 link_text = 'Link to the report (with markdown rendered) on WhatUp: {0}'.format(
     current_post_view_url)
 auto_notice = 'This email was automatically generated using the WhatUp API.\n' \
-        'Please email project-whatup@googlegroups.com with any problems'
+    'Please email project-whatup@googlegroups.com with any problems'
 body = '{0}\n\n{1}\n\n{2}'.format(link_text, post_text, auto_notice)
 
 # Send email
@@ -64,7 +66,12 @@ new_post_body = ''
 for name in names:
     new_post_body = '{0}\n\n**{1}**:'.format(new_post_body, name)
 new_post = {'user_id': 10, 'topic': new_post_topic, 'body': new_post_body}
-resp = requests.post(base_address, headers=headers, data=dumps(new_post))
+resp = requests.post(
+    base_address,
+    headers=headers,
+    cookies=cookies,
+    data=dumps(new_post)
+)
 new_post_id = resp.json()['id']
 config.set('Required', 'post_id', new_post_id)
 with open('/home/ogmios/.checksite.cfg', 'wb') as configfile:
