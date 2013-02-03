@@ -3,8 +3,8 @@
 mysql -uroot -pwhatup -e "drop database tests; create database tests";
 virtualenv --distribute .;
 source bin/activate;
-pip install --upgrade distribute
-pip install -r requirements.txt;
+pip install --use-mirrors --upgrade distribute
+pip install --use-mirrors -r requirements.txt;
 patch lib/python2.7/site-packages/flask_sqlalchemy.py < patch_flask_sqlA.patch
 patch -p0 -i patch_flask_restless.patch
 make coverage
