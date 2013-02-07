@@ -8,7 +8,7 @@ from urllib import unquote
 from os.path import basename
 from urlparse import urlsplit
 from ConfigParser import NoSectionError
-from flask import abort, g, session
+from flask import abort, g, session, flash
 from flask.ext.restless import APIManager
 from os import environ
 from sqlalchemy.exc import (
@@ -34,6 +34,13 @@ def check_login():
         g.user = m.User.query.filter_by(openid=session['openid']).first()
     if not g.user:
         return False
+
+    email = g.user.email
+    whitelisted = m.OpenIDWhitelist.query.filter_by(email=email).first()
+    if whitelisted is None:
+        flash('You are no longer whitelisted.')
+        abort(401)
+
     return True
 
 
