@@ -30,11 +30,13 @@ def login():
 
 @open_id.after_login
 def create_or_login(resp):
-    """This is called when login with OpenID succeeded and it's not
-necessary to figure out if this is the users's first login or not.
-This function has to redirect otherwise the user will be presented
-with a terrible URL which we certainly don't want.
-"""
+    """
+    This is called when login with OpenID succeeded and it's not
+    necessary to figure out if this is the users's first login or not.
+    This function has to redirect otherwise the user will be presented
+    with a terrible URL which we certainly don't want.
+
+    """
     session['openid'] = resp.identity_url
     user = m.User.query.filter_by(openid=resp.identity_url).first()
     if user is not None:
@@ -58,6 +60,13 @@ with a terrible URL which we certainly don't want.
         nickname = resp.nickname
     except AttributeError:
         pass
+
+    # Check whitelist for email
+    # TODO: link whitelist entry with our new user
+    whitelisted = m.OpenIDWhitelist.query.filter_by(email=email).first()
+    if whitelisted is None:
+        flash('You are not authorized to sign up for this organization')
+        abort(401)
 
     new_user = m.User(
         name=fullname,
