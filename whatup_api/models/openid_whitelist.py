@@ -15,3 +15,5 @@ class OpenIDWhitelist(db.Model):
     name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(100), nullable=False)
     is_deleted = db.Column(db.Boolean, default=False, nullable=False)
+    # TODO
+    #added_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)

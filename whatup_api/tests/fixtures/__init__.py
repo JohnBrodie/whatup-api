@@ -27,5 +27,5 @@ all_data = (
     SubscriptionData,
     AttachmentData,
     RevisionData,
-    OpenIDWhitelistData
+    OpenIDWhitelistData,
 )

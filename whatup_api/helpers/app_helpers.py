@@ -188,6 +188,18 @@ def create_api(app):
         post_form_preprocessor=add_user_to_request,
         url_prefix=PREFIX,
     )
+    manager.create_api(
+        m.OpenIDWhitelist,
+        methods=ALL_HTTP_METHODS,
+        exclude_columns=[
+            'is_deleted',
+        ],
+        authentication_required_for=ALL_HTTP_METHODS,
+        authentication_function=check_login,
+        validation_exceptions=validation_exceptions,
+        # TODO: keep track of who changes whitelist
+        #post_form_preprocessor=add_user_to_request,
+    )
 
 
 def get_new_attachment_filename(config):
