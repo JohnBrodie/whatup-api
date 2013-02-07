@@ -19,4 +19,13 @@ from whatup_api.tests.fixtures.post_data import PostData
 from whatup_api.tests.fixtures.subscription_data import SubscriptionData
 from whatup_api.tests.fixtures.attachment_data import AttachmentData
 from whatup_api.tests.fixtures.revision_data import RevisionData
-all_data = (UserData, TagData, PostData, SubscriptionData, AttachmentData, RevisionData,)
+from whatup_api.tests.fixtures.openid_whitelist_data import OpenIDWhitelistData
+all_data = (
+    UserData,
+    TagData,
+    PostData,
+    SubscriptionData,
+    AttachmentData,
+    RevisionData,
+    OpenIDWhitelistData
+)

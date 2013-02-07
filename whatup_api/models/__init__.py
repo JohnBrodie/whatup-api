@@ -25,3 +25,4 @@ from whatup_api.models.post import Post
 from whatup_api.models.subscription import Subscription
 from whatup_api.models.attachment import Attachment
 from whatup_api.models.revision import Revision
+from whatup_api.models.openid_whitelist import OpenIDWhitelist
