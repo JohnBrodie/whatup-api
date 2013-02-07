@@ -31,7 +31,7 @@ class WhenCreatingValidUser(_FunctionalTestCase):
 
     endpoint = '/users'
     expected_status = 201
-    post_data = {'name': 'name here'}
+    post_data = {'name': 'name here', 'email': 'ayma.moron@gmail.com'}
     new_id = 3
 
     def should_return_new_user_id(self):
@@ -47,7 +47,7 @@ class WhenCreatingInvalidUser(_FunctionalTestCase):
 
     endpoint = '/users'
     expected_status = 400
-    post_data = {'name': None}
+    post_data = {'name': None, 'email': 'ayma.moron@gmail.com'}
 
     def should_return_validation_error(self):
         self.assertEqual(self.json['validation_errors']['name'],

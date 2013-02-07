@@ -17,3 +17,4 @@ class UserData(DataSet):
 
     class SpecifiesNone:
         name = 'John Doe'
+        email = 'anita.hoare@gmail.com'

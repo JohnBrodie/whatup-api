@@ -2,6 +2,8 @@
 from datetime import datetime
 from fixture import DataSet
 
+from whatup_api.tests.fixtures.user_data import UserData
+
 
 class OpenIDWhitelistData(DataSet):
 
@@ -10,8 +12,8 @@ class OpenIDWhitelistData(DataSet):
         modified_at = datetime(2001, 10, 11)
         name = 'name here'
         is_deleted = False
-        email = 'joe@blow.com'
+        email = UserData.Default.email
 
     class SpecifiesNone:
         name = 'name again'
-        email = 'carl@carl.cc'
+        email = UserData.SpecifiesNone.email
