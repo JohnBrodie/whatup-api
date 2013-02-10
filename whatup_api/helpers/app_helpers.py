@@ -43,7 +43,7 @@ def configure_logging(app):
 
     """
     try:
-        logging.config.fileConfig('setup.cfg')
+        logging.config.fileConfig('/var/lib/jenkins/jobs/whatup-api/workspace/setup.cfg')
     except NoSectionError:
         logging.config.fileConfig('../../setup.cfg')
 
