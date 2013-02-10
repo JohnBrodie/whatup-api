@@ -6,7 +6,7 @@ from whatup_api.tests.functional import _FunctionalTestCase, _NotFoundTestCase
 
 class WhenGettingPostsIndex(_FunctionalTestCase):
 
-    endpoint = '/api/posts'
+    endpoint = '/posts'
     expected_status = 200
 
     def should_return_all_posts(self):
@@ -16,7 +16,7 @@ class WhenGettingPostsIndex(_FunctionalTestCase):
 class WhenGettingPostByID(_FunctionalTestCase):
 
     expected_status = 200
-    endpoint = '/api/posts/1'
+    endpoint = '/posts/1'
 
     def should_return_post_body(self):
         self.assertEqual(self.json['body'],
@@ -25,12 +25,12 @@ class WhenGettingPostByID(_FunctionalTestCase):
 
 class WhenGettingPostWithInvalidID(_NotFoundTestCase):
 
-    endpoint = '/api/posts/999'
+    endpoint = '/posts/999'
 
 
 class WhenCreatingValidPost(_FunctionalTestCase):
 
-    endpoint = '/api/posts'
+    endpoint = '/posts'
     expected_status = 201
     post_data = {'body': 'body here'}
     new_id = 3
@@ -45,7 +45,7 @@ class WhenCreatingValidPost(_FunctionalTestCase):
 
 class WhenCreatingInvalidPost(_FunctionalTestCase):
 
-    endpoint = '/api/posts'
+    endpoint = '/posts'
     expected_status = 400
     post_data = {'body': None}
 
@@ -55,7 +55,7 @@ class WhenCreatingInvalidPost(_FunctionalTestCase):
 class WhenDeletingPosts(_FunctionalTestCase):
 
     expected_status = 204
-    endpoint = '/api/posts/1'
+    endpoint = '/posts/1'
     delete = True
 
     def should_not_remove_model(self):
@@ -68,13 +68,13 @@ class WhenDeletingPosts(_FunctionalTestCase):
         self.assertEqual(query.is_deleted, True)
 
     def should_not_return_deleted(self):
-        response_data = json.loads(self.client.get('/api/posts').data)
+        response_data = json.loads(self.client.get('/posts').data)
         self.assertNotEqual(response_data['objects'][0]['id'], 1)
 
 
 class WhenEditingPosts(_FunctionalTestCase):
 
-    endpoint = '/api/posts/1'
+    endpoint = '/posts/1'
     expected_status = 200
     put_data = {'body': 'new body here',
                 'tags': []}
@@ -92,12 +92,12 @@ class WhenEditingPosts(_FunctionalTestCase):
         self.assertEqual(self.orig_post, latestRevision['body'])
 
 class WhenSupplyingBodyAndRevId(_FunctionalTestCase):
-    endpoint = '/api/posts/1'
+    endpoint = '/posts/1'
     expected_status = 400
     put_data = {'body': 'bodybody', 'rev_id': 1}
 
 class WhenRevertingToOldPost(_FunctionalTestCase):
-    endpoint = '/api/posts/1'
+    endpoint = '/posts/1'
     expected_status = 200
     put_data = {'rev_id': 1}
 
@@ -106,13 +106,13 @@ class WhenRevertingToOldPost(_FunctionalTestCase):
         self.assertEqual(revision.body, self.json['body'])
 
 class WhenRevertingToBodyBelongingToDiffPost(_FunctionalTestCase):
-    endpoint = '/api/posts/2'
+    endpoint = '/posts/2'
     expected_status = 400
     put_data = {'rev_id': 1}
 
 class WhenEditingPostWithInvalidID(_FunctionalTestCase):
 
-    endpoint = '/api/posts/999'
+    endpoint = '/posts/999'
     expected_status = 404
     expected_content_type = 'application/json'
     put_data = {'body': 'new body here',

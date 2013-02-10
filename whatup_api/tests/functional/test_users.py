@@ -5,7 +5,7 @@ from whatup_api.tests.functional import _FunctionalTestCase, _NotFoundTestCase
 
 class WhenGettingUsersIndex(_FunctionalTestCase):
 
-    endpoint = '/api/users'
+    endpoint = '/users'
     expected_status = 200
 
     def should_return_all_users(self):
@@ -15,7 +15,7 @@ class WhenGettingUsersIndex(_FunctionalTestCase):
 class WhenGettingUserByID(_FunctionalTestCase):
 
     expected_status = 200
-    endpoint = '/api/users/1'
+    endpoint = '/users/1'
 
     def should_return_user_body(self):
         self.assertEqual(self.json['bio'],
@@ -24,12 +24,12 @@ class WhenGettingUserByID(_FunctionalTestCase):
 
 class WhenGettingUserWithInvalidID(_NotFoundTestCase):
 
-    endpoint = '/api/users/999'
+    endpoint = '/users/999'
 
 
 class WhenCreatingValidUser(_FunctionalTestCase):
 
-    endpoint = '/api/users'
+    endpoint = '/users'
     expected_status = 201
     post_data = {'name': 'name here'}
     new_id = 3
@@ -45,7 +45,7 @@ class WhenCreatingValidUser(_FunctionalTestCase):
 
 class WhenCreatingInvalidUser(_FunctionalTestCase):
 
-    endpoint = '/api/users'
+    endpoint = '/users'
     expected_status = 400
     post_data = {'name': None}
 
@@ -56,7 +56,7 @@ class WhenCreatingInvalidUser(_FunctionalTestCase):
 
 class WhenDeletingUsers(_FunctionalTestCase):
 
-    endpoint = '/api/users/1'
+    endpoint = '/users/1'
     expected_status = 204
     delete = True
 
@@ -73,7 +73,7 @@ class WhenDeletingUsers(_FunctionalTestCase):
 
 class WhenEditingUsers(_FunctionalTestCase):
 
-    endpoint = '/api/users/1'
+    endpoint = '/users/1'
     expected_status = 200
     put_data = {'bio': 'new bio here'}
 
@@ -83,7 +83,7 @@ class WhenEditingUsers(_FunctionalTestCase):
 
 class WhenEditingUserWithInvalidID(_FunctionalTestCase):
 
-    endpoint = '/api/users/999'
+    endpoint = '/users/999'
     expected_status = 404
     expected_content_type = 'application/json'
     put_data = {'bio': 'new bio here'}

@@ -5,7 +5,7 @@ from whatup_api.tests.functional import _FunctionalTestCase, _NotFoundTestCase
 
 class WhenGettingSubscriptionsIndex(_FunctionalTestCase):
 
-    endpoint = '/api/subscriptions'
+    endpoint = '/subscriptions'
     expected_status = 200
 
     def should_return_all_subscriptions(self):
@@ -15,7 +15,7 @@ class WhenGettingSubscriptionsIndex(_FunctionalTestCase):
 class WhenGettingSubscriptionByID(_FunctionalTestCase):
 
     expected_status = 200
-    endpoint = '/api/subscriptions/1'
+    endpoint = '/subscriptions/1'
 
     def should_return_subscription_user_id(self):
         self.assertEqual(self.json['user_id'],
@@ -24,12 +24,12 @@ class WhenGettingSubscriptionByID(_FunctionalTestCase):
 
 class WhenGettingSubscriptionWithInvalidID(_NotFoundTestCase):
 
-    endpoint = '/api/subscriptions/999'
+    endpoint = '/subscriptions/999'
 
 
 class WhenCreatingValidSubscription(_FunctionalTestCase):
 
-    endpoint = '/api/subscriptions'
+    endpoint = '/subscriptions'
     expected_status = 201
     post_data = {}
     new_id = 3
@@ -45,7 +45,7 @@ class WhenCreatingValidSubscription(_FunctionalTestCase):
 # TODO: Is broken until next release of restless, unless we patch
 #class WhenCreatingSubscriptionWithInvalidSubscribee(_FunctionalTestCase):
 #
-#    endpoint = '/api/subscriptions'
+#    endpoint = '/subscriptions'
 #    expected_status = 400
 #    post_data = {'subscribee': 999}
 #
@@ -56,7 +56,7 @@ class WhenCreatingValidSubscription(_FunctionalTestCase):
 
 #class WhenCreatingSubscriptionWithInvalidUser(_FunctionalTestCase):
 #
-#    endpoint = '/api/subscriptions'
+#    endpoint = '/subscriptions'
 #    expected_status = 400
 #    post_data = {'user': 999}
 #
@@ -66,7 +66,7 @@ class WhenCreatingValidSubscription(_FunctionalTestCase):
 
 class WhenDeletingSubscriptions(_FunctionalTestCase):
 
-    endpoint = '/api/subscriptions/1'
+    endpoint = '/subscriptions/1'
     expected_status = 204
     delete = True
 
@@ -83,7 +83,7 @@ class WhenDeletingSubscriptions(_FunctionalTestCase):
 
 class WhenEditingSubscriptions(_FunctionalTestCase):
 
-    endpoint = '/api/subscriptions/1'
+    endpoint = '/subscriptions/1'
     expected_status = 200
     put_data = {'user': 2}
 
@@ -93,7 +93,7 @@ class WhenEditingSubscriptions(_FunctionalTestCase):
 
 class WhenEditingSubscriptionWithInvalidID(_FunctionalTestCase):
 
-    endpoint = '/api/subscriptions/999'
+    endpoint = '/subscriptions/999'
     expected_status = 404
     expected_content_type = 'application/json'
     put_data = {'user': 2}

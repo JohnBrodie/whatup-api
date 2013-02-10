@@ -121,6 +121,7 @@ def create_api(app):
     our models.
 
     """
+    PREFIX = None
     ALL_HTTP_METHODS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
 
     validation_exceptions = [ArgumentError, IntegrityError, OperationalError,
@@ -141,7 +142,8 @@ def create_api(app):
         authentication_function=check_login,
         validation_exceptions=validation_exceptions,
         post_form_preprocessor=add_user_to_request,
-        put_form_preprocessor=handle_revision_updates
+        put_form_preprocessor=handle_revision_updates,
+        url_prefix=PREFIX,
     )
     manager.create_api(
         m.User,
@@ -157,7 +159,8 @@ def create_api(app):
         ],
         authentication_required_for=ALL_HTTP_METHODS,
         authentication_function=check_login,
-        validation_exceptions=validation_exceptions
+        validation_exceptions=validation_exceptions,
+        url_prefix=PREFIX,
     )
     manager.create_api(
         m.Tag,
@@ -169,6 +172,7 @@ def create_api(app):
         validation_exceptions=validation_exceptions,
         authentication_required_for=ALL_HTTP_METHODS,
         authentication_function=check_login,
+        url_prefix=PREFIX,
     )
     manager.create_api(
         m.Subscription,
@@ -182,6 +186,7 @@ def create_api(app):
         authentication_function=check_login,
         validation_exceptions=validation_exceptions,
         post_form_preprocessor=add_user_to_request,
+        url_prefix=PREFIX,
     )
 
 

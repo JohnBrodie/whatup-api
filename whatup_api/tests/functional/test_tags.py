@@ -5,7 +5,7 @@ from whatup_api.tests.functional import _FunctionalTestCase, _NotFoundTestCase
 
 class WhenGettingTagsIndex(_FunctionalTestCase):
 
-    endpoint = '/api/tags'
+    endpoint = '/tags'
     expected_status = 200
 
     def should_return_all_tags(self):
@@ -15,7 +15,7 @@ class WhenGettingTagsIndex(_FunctionalTestCase):
 class WhenGettingTagByID(_FunctionalTestCase):
 
     expected_status = 200
-    endpoint = '/api/tags/1'
+    endpoint = '/tags/1'
 
     def should_return_tag_summary(self):
         self.assertEqual(self.json['summary'],
@@ -24,12 +24,12 @@ class WhenGettingTagByID(_FunctionalTestCase):
 
 class WhenGettingTagWithInvalidID(_NotFoundTestCase):
 
-    endpoint = '/api/tags/999'
+    endpoint = '/tags/999'
 
 
 class WhenCreatingValidTag(_FunctionalTestCase):
 
-    endpoint = '/api/tags'
+    endpoint = '/tags'
     expected_status = 201
     post_data = {'name': 'name here'}
     new_id = 3
@@ -45,7 +45,7 @@ class WhenCreatingValidTag(_FunctionalTestCase):
 
 class WhenCreatingInvalidTag(_FunctionalTestCase):
 
-    endpoint = '/api/tags'
+    endpoint = '/tags'
     expected_status = 400
     post_data = {'name': None}
 
@@ -56,7 +56,7 @@ class WhenCreatingInvalidTag(_FunctionalTestCase):
 
 class WhenDeletingTags(_FunctionalTestCase):
 
-    endpoint = '/api/tags/1'
+    endpoint = '/tags/1'
     expected_status = 204
     delete = True
 
@@ -73,7 +73,7 @@ class WhenDeletingTags(_FunctionalTestCase):
 
 class WhenEditingTags(_FunctionalTestCase):
 
-    endpoint = '/api/tags/1'
+    endpoint = '/tags/1'
     expected_status = 200
     put_data = {'summary': 'new summary here'}
 
@@ -83,7 +83,7 @@ class WhenEditingTags(_FunctionalTestCase):
 
 class WhenEditingTagWithInvalidID(_FunctionalTestCase):
 
-    endpoint = '/api/tags/999'
+    endpoint = '/tags/999'
     expected_status = 404
     expected_content_type = 'application/json'
     put_data = {'summary': 'new summary here'}
