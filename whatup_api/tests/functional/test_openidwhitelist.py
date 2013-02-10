@@ -6,7 +6,7 @@ from whatup_api.tests.functional import _FunctionalTestCase, _NotFoundTestCase
 
 class WhenGettingOpenIDWhitelistsIndex(_FunctionalTestCase):
 
-    endpoint = '/api/openidwhitelists'
+    endpoint = '/openidwhitelists'
     expected_status = 200
 
     def should_return_all_openidwhitelists(self):
@@ -16,7 +16,7 @@ class WhenGettingOpenIDWhitelistsIndex(_FunctionalTestCase):
 class WhenGettingOpenIDWhitelistByID(_FunctionalTestCase):
 
     expected_status = 200
-    endpoint = '/api/openidwhitelists/1'
+    endpoint = '/openidwhitelists/1'
 
     def should_return_openidwhitelist_body(self):
         self.assertEqual(self.json['name'],
@@ -29,12 +29,12 @@ class WhenGettingOpenIDWhitelistByID(_FunctionalTestCase):
 
 class WhenGettingOpenIDWhitelistWithInvalidID(_NotFoundTestCase):
 
-    endpoint = '/api/openidwhitelists/999'
+    endpoint = '/openidwhitelists/999'
 
 
 class WhenCreatingValidOpenIDWhitelist(_FunctionalTestCase):
 
-    endpoint = '/api/openidwhitelists'
+    endpoint = '/openidwhitelists'
     expected_status = 201
     post_data = {
         'name': 'name here',
@@ -52,7 +52,7 @@ class WhenCreatingValidOpenIDWhitelist(_FunctionalTestCase):
 
 class WhenCreatingInvalidOpenIDWhitelist(_FunctionalTestCase):
 
-    endpoint = '/api/openidwhitelists'
+    endpoint = '/openidwhitelists'
     expected_status = 400
     post_data = {'name': None, 'email': 'a@b.cc'}
 
@@ -63,7 +63,7 @@ class WhenCreatingInvalidOpenIDWhitelist(_FunctionalTestCase):
 class WhenDeletingOpenIDWhitelists(_FunctionalTestCase):
 
     expected_status = 204
-    endpoint = '/api/openidwhitelists/1'
+    endpoint = '/openidwhitelists/1'
     delete = True
 
     def should_not_remove_model(self):
@@ -76,13 +76,13 @@ class WhenDeletingOpenIDWhitelists(_FunctionalTestCase):
         self.assertEqual(query.is_deleted, True)
 
     def should_not_return_deleted(self):
-        response_data = json.loads(self.client.get('/api/openidwhitelists').data)
+        response_data = json.loads(self.client.get('/openidwhitelists').data)
         self.assertNotEqual(response_data['objects'][0]['id'], 1)
 
 
 class WhenEditingOpenIDWhitelists(_FunctionalTestCase):
 
-    endpoint = '/api/openidwhitelists/1'
+    endpoint = '/openidwhitelists/1'
     expected_status = 200
     put_data = {'name': 'new name'}
 
@@ -92,7 +92,7 @@ class WhenEditingOpenIDWhitelists(_FunctionalTestCase):
 
 class WhenEditingOpenIDWhitelistWithInvalidID(_FunctionalTestCase):
 
-    endpoint = '/api/openidwhitelists/999'
+    endpoint = '/openidwhitelists/999'
     expected_status = 404
     expected_content_type = 'application/json'
     put_data = {'name': 'new name'}
