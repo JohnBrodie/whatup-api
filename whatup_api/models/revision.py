@@ -2,6 +2,14 @@
 from whatup_api.models import db
 from sqlalchemy.sql import func
 
+
+
+revTags = db.Table('revtags', db.metadata,
+                    db.Column('revision', db.Integer, db.ForeignKey('revisions.id')),
+                    db.Column('tag', db.Integer, db.ForeignKey('tags.id'))
+                    )
+
+
 class Revision(db.Model):
     """Revision model"""
 
@@ -13,4 +21,6 @@ class Revision(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=True)
     body = db.Column(db.String(1000), nullable=False)
+    topic = db.Column(db.String(1000), nullable=False)
+    tags = db.relationship("Tag", secondary=lambda: revTags, lazy='dynamic')
     is_deleted = db.Column(db.Boolean, default=False, nullable=False)

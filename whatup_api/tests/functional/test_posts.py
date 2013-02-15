@@ -77,8 +77,9 @@ class WhenEditingPosts(_FunctionalTestCase):
     endpoint = '/posts/1'
     expected_status = 200
     put_data = {'body': 'new body here',
-                'tags': []}
+                'tags': [{'name': 'newtag'}]}
     orig_post = 'body goes here'
+    orig_topic = 'topic goes here'
 
     def should_return_edited_post_data(self):
         self.assertEqual(self.put_data['body'], self.json['body'])
@@ -90,6 +91,17 @@ class WhenEditingPosts(_FunctionalTestCase):
             if latestRevision is None or revision['id'] > latestRevision['id']:
                 latestRevision = revision
         self.assertEqual(self.orig_post, latestRevision['body'])
+
+    def should_save_old_topic(self):
+        revisions = self.json['revisions']
+        latestRevision = None
+        for revision in revisions:
+            if latestRevision is None or revision['id'] > latestRevision['id']:
+                latestRevision = revision
+        self.assertEqual(self.orig_topic, latestRevision['topic'])
+
+    def should_have_new_tags(self):
+        self.assertEqual(self.put_data['tags'][0]['name'], 'newtag')
 
 class WhenSupplyingBodyAndRevId(_FunctionalTestCase):
     endpoint = '/posts/1'

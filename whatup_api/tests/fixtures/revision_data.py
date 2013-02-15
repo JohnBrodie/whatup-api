@@ -14,8 +14,12 @@ class RevisionData(DataSet):
         author = UserData.Default
         post = PostData.Default
         body = "Lorem ipsum"
+        topic = "Schmorem schmipsum"
+        is_deleted = False
+        
 
     class SpecifiesNone:
         author = UserData.Default
         post = PostData.Default
         body = "Lorem ipsum"
+        topic = "Schmorem schmipsum"

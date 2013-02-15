@@ -73,25 +73,26 @@ def add_user_to_request(post_data):
 
 
 def handle_revision_updates(put_data, instid):
+    """ If a post is being modified, save the
+    original content of the post
+
+    """
     if not check_login():
         abort(401)
-    if 'body' not in put_data and 'rev_id' not in put_data:
-        return put_data
-    if 'body' in put_data and 'rev_id' in put_data:
+
+    # if 'rev_id' is posted, we're reverting to 
+    # an existing revision, so no other fields should 
+    # be present
+    if 'rev_id' in put_data and len(put_data) > 1:
         abort(500)
+
     post = m.Post.query.get(instid)
+
     if post is None:
         put_data.pop('rev_id', None)
         return put_data
 
-    if 'body' in put_data:
-        if put_data['body'] is None:
-            return put_data
-        if put_data['body'] == post.body:
-            put_data.pop('body', None)
-            return put_data
-        revision = m.Revision(user_id=g.user.id, body=post.body)
-    elif 'rev_id' in put_data:
+    if 'rev_id' in put_data:
         rev = m.Revision.query.get(put_data['rev_id'])
         put_data.pop('rev_id', None)
         if rev is None:
@@ -99,20 +100,27 @@ def handle_revision_updates(put_data, instid):
         if rev not in post.revisions:
             abort(500)
         put_data['body'] = rev.body
-        revision = m.Revision(
-            user_id=g.user.id,
-            post_id=post.id,
-            body=post.body
-        )
+        put_data['topic'] = rev.topic
+        put_data['tags'] = []
+        for tag in rev.tags:
+            put_data['tags'].append({'id': tag.id})
 
-    if revision is not None:
-        put_data.pop('revisions', None)
-        post.revisions.append(revision)
-        try:
-            m.db.session.add(revision)
-            m.db.session.commit()
-        except IntegrityError:
-            abort(400)
+    revision = m.Revision(user_id = post.user_id, 
+                          post_id = post.id, 
+                          topic = post.topic, 
+                          body = post.body)
+
+    for tag in post.tags:
+        revision.tags.append(tag)
+
+    put_data.pop('revisions', None)
+    post.revisions.append(revision)
+    put_data['user_id'] = g.user.id
+    try:
+        m.db.session.add(revision)
+        m.db.session.commit()
+    except IntegrityError:
+        abort(400)
     return put_data
 
 
@@ -137,6 +145,7 @@ def create_api(app):
             'author.is_deleted',
             'attachments.is_deleted',
             'revisions.is_deleted',
+            'tags.is_deleted',
         ],
         authentication_required_for=ALL_HTTP_METHODS,
         authentication_function=check_login,
@@ -156,6 +165,7 @@ def create_api(app):
             'posts.is_deleted',
             'attachments.is_deleted',
             'revisions.is_deleted',
+            'tags.is_deleted',
         ],
         authentication_required_for=ALL_HTTP_METHODS,
         authentication_function=check_login,
