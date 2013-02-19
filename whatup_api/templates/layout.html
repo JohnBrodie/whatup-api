@@ -4,7 +4,17 @@
    filename='style.css') }}">
 <link rel=stylesheet type=text/css href="{{ url_for('static', 
    filename='bootstrap.css') }}">
-<h1>Project WhatUp Login</h1>
+
+
+<header class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="header-container">          
+          <a class="brand" href="#">WhatUp</a>
+        </div>
+      </div>
+    </header>
+
+<div class="container">
 <ul class=navigation>
   <li><a href="http://srd.projectwhatup.us/#">overview</a>
   {% if g.user %}
@@ -17,3 +27,8 @@
   <p class=message>{{ message }}
 {% endfor %}
 {% block body %}{% endblock %}
+
+<footer>
+ <p>&copy; Project WhatUp, 2012</p>
+</footer>
+</div>
