@@ -17,6 +17,6 @@ else # Staging
     mv whatup_api/staging_config.py whatup_api/prod_config.py
     mv staging_setup.cfg setup.cfg
     if [[ $EUID -eq 107 ]]; then
-        touch /var/www/s-api/whatup_api.wsgi  # Tell apache to reload app
+        touch /var/www/s-api/whatup_api_staging.wsgi  # Tell apache to reload app
     fi
 fi
