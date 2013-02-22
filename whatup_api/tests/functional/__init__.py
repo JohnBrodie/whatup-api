@@ -4,6 +4,10 @@ from mock import Mock, patch
 
 from whatup_api.tests import _BaseApiTestCase
 
+from flask.ext.login import login_user, logout_user
+
+from whatup_api import models as m
+
 
 class _FunctionalTestCase(_BaseApiTestCase):
 
@@ -26,15 +30,13 @@ class _FunctionalTestCase(_BaseApiTestCase):
         return json
 
     @classmethod
-    def set_openid_key(cls):
-        with cls.client.session_transaction() as session:
-            session['openid'] = 'openidkey'
+    def login(cls):
+        cls.client.post('/login', data={'username':'Ayush Sobti', 'password':'password'},
+                headers=[('Content-Type', 'multipart/form-data')])
 
     @classmethod
-    def remove_openid_key(cls):
-        with cls.client.session_transaction() as session:
-            if session.get('openid'):
-                del session['openid']
+    def logout(cls):
+        cls.client.get('/logout')
 
     @classmethod
     def get_response(cls, login=True):
@@ -44,7 +46,7 @@ class _FunctionalTestCase(_BaseApiTestCase):
 
         with cls.client:
             if login:
-                cls.set_openid_key()
+                cls.login()
 
             if hasattr(cls, 'filename'):
                 if hasattr(cls, 'filepath'):
@@ -97,19 +99,19 @@ class _FunctionalTestCase(_BaseApiTestCase):
         self.assertNotIn('is_deleted', self.response.data)
 
     def should_return_401_status_code_if_not_logged_in(self):
-        self.remove_openid_key()
+        self.logout()
         response = self.get_response(login=False)
         self.assertEqual(response.status_code, 401)
 
     def should_return_json_if_not_logged_in(self):
         expected_content_type = 'application/json'
-        self.remove_openid_key()
+        self.logout()
         response = self.get_response(login=False)
         self.assertEqual(response.content_type, expected_content_type)
 
     def should_return_login_url_if_not_logged_in(self):
         expected_url = '/login'
-        self.remove_openid_key()
+        self.logout()
         response = self.get_response(login=False)
         json_response = self.response_to_json(response)
         self.assertEqual(json_response['url'], expected_url)

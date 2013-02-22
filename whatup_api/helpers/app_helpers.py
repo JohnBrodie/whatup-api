@@ -11,6 +11,7 @@ from ConfigParser import NoSectionError
 from flask import abort, g, session
 from flask.ext.restless import APIManager
 from os import environ
+from flask.ext.login import current_user
 from sqlalchemy.exc import (
     ArgumentError, IntegrityError,
     OperationalError, InvalidRequestError
@@ -21,21 +22,13 @@ from whatup_api import prod_config
 from whatup_api import models as m
 from whatup_api.exceptions import APIError
 
-
 def check_login():
-    """Check if user has openid key in their session,
-    and if that key is registered with us. This function
+    """Check if user is logged in. This function
     should be used as the `authentication_function` for all
     api endpoints.
 
     """
-    g.user = None
-    if 'openid' in session:
-        g.user = m.User.query.filter_by(openid=session['openid']).first()
-    if not g.user:
-        return False
-    return True
-
+    return current_user.is_authenticated()
 
 def configure_logging(app):
     """Set up logging, tests and running app
@@ -71,7 +64,7 @@ def add_user_to_request(post_data):
     before passing the request on to the model.
 
     """
-    post_data['user_id'] = g.user.id
+    post_data['user_id'] = current_user.id
     return post_data
 
 
@@ -80,11 +73,8 @@ def handle_revision_updates(put_data, instid):
     original content of the post
 
     """
-    if not check_login():
-        abort(401)
-
-    # if 'rev_id' is posted, we're reverting to
-    # an existing revision, so no other fields should
+    # if 'rev_id' is posted, we're reverting to 
+    # an existing revision, so no other fields should 
     # be present
     if 'rev_id' in put_data and len(put_data) > 1:
         abort(500)
@@ -118,7 +108,7 @@ def handle_revision_updates(put_data, instid):
 
     put_data.pop('revisions', None)
     post.revisions.append(revision)
-    put_data['user_id'] = g.user.id
+    put_data['user_id'] = current_user.id
     try:
         m.db.session.add(revision)
         m.db.session.commit()
@@ -159,9 +149,8 @@ def create_api(app):
     )
     manager.create_api(
         m.User,
-        methods=ALL_HTTP_METHODS,
+        methods=['GET', 'PATCH', 'PUT', 'DELETE'],
         exclude_columns=[
-            'openid',
             'is_deleted',
             'tags_created.is_deleted',
             'subscriptions.is_deleted',
@@ -170,7 +159,7 @@ def create_api(app):
             'revisions.is_deleted',
             'tags.is_deleted',
         ],
-        authentication_required_for=ALL_HTTP_METHODS,
+        authentication_required_for=['GET', 'PATCH', 'PUT', 'DELETE'],
         authentication_function=check_login,
         validation_exceptions=validation_exceptions,
         url_prefix=PREFIX,
@@ -227,7 +216,7 @@ def create_attachment_from_file(uploaded_file, config):
     uploaded_file.save(f)
 
     return m.Attachment(
-        user_id=g.user.id,
+        user_id=current_user.id,
         name=original_name,
         location=filename,
     )
@@ -259,7 +248,7 @@ def create_attachment_from_url(url, config):
         raise IOError
 
     return m.Attachment(
-        user_id=g.user.id,
+        user_id=current_user.id,
         name=original_name,
         location=filename,
     )

@@ -31,7 +31,7 @@ class WhenCreatingValidUser(_FunctionalTestCase):
 
     endpoint = '/users'
     expected_status = 201
-    post_data = {'name': 'name here'}
+    post_data = {'name': 'name here', 'password': 'password'}
     new_id = 3
 
     def should_return_new_user_id(self):
@@ -43,16 +43,17 @@ class WhenCreatingValidUser(_FunctionalTestCase):
         self.assertIsNotNone(new_user)
 
 
-class WhenCreatingInvalidUser(_FunctionalTestCase):
+class WhenCreatingNullUser(_FunctionalTestCase):
 
     endpoint = '/users'
     expected_status = 400
     post_data = {'name': None}
 
-    def should_return_validation_error(self):
-        self.assertEqual(self.json['validation_errors']['name'],
-                         'Must specify name')
+class WhenCreatingWithTooSmallPassword(_FunctionalTestCase):
 
+    endpoint = '/users'
+    expected_status = 400
+    post_data = {'name': 'username', 'password': 'p'}
 
 class WhenDeletingUsers(_FunctionalTestCase):
 

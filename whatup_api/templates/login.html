@@ -1,24 +1,13 @@
 {% extends "layout.html" %}
 {% block title %}Sign in{% endblock %}
 {% block body %}
-  <script>
-    function oidSubmit(openid) {
-      oidform = document.forms[0];
-      oidform.openid.value = openid;
-      oidform.submit();
-    }
-  </script>
-
   <h2>Sign in</h2>
-  {% for provider_name, provider_url in providers.iteritems() %}
-  <a href=javascript:oidSubmit("{{provider_url}}");>Sign in with {{provider_name}}</a>
   <br />
-  {% endfor %}
   <form action="" method=post>
     {% if error %}<p class=error><strong>Error:</strong> {{ error }}</p>{% endif %}
     <p>
-      OpenID:
-      <input type=text name=openid size=30>
+      <input type=text name=username size=30>
+      <input type=text name=password size=30>
       <input type=submit value="Sign in">
       <input type=hidden name=next value="{{ next }}">
   </form>

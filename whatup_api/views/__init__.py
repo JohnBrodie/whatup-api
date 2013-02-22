@@ -1,2 +1,2 @@
-from whatup_api.views.open_id import *
+from whatup_api.views.login import *
 from whatup_api.views.views import *

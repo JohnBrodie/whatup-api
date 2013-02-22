@@ -60,18 +60,6 @@ class DescribeUserModel(UserModelTestCase):
     def should_have_nullable_email(self):
         self.assertEqual(self.SpecifiesNone.email, None)
 
-    def should_have_openid(self):
-        self.assertEqual(self.Default.openid, self.user_data.Default.openid)
-
-    def should_have_openid_as_string(self):
-        self.assertTrue(self.is_type('openid', self.db.String))
-
-    def should_have_openid_with_length(self):
-        self.assertEqual(self.get_length('openid'), 255)
-
-    def should_have_nullable_openid(self):
-        self.assertEqual(self.SpecifiesNone.openid, None)
-
     def should_have_subscriptions(self):
         subscriptions = self.Default.subscriptions.all()
         self.assertEquals(len(subscriptions), 2)

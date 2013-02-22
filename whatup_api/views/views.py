@@ -2,6 +2,7 @@ import os
 
 from flask import request, abort, jsonify, redirect, g
 from sqlalchemy.exc import IntegrityError
+from flask.ext.login import login_required
 
 from whatup_api.app import app
 from whatup_api import models as m
@@ -10,6 +11,8 @@ from whatup_api.helpers.app_helpers import (
     create_attachment_from_url,
     create_attachment_from_file
 )
+
+from json import loads
 
 
 @app.route('/', methods=['GET'])
@@ -27,6 +30,7 @@ def is_logged_in():
     return jsonify(is_logged_in=is_logged_in)
 
 
+<<<<<<< HEAD
 @app.route('/attachments/<int:attachment_id>', methods=['DELETE'])
 def delete_attachment(attachment_id):
     if not check_login():
@@ -49,16 +53,16 @@ def delete_attachment(attachment_id):
     except IntegrityError:
         abort(400)
     return jsonify(status='File deleted'), 200
+=======
+>>>>>>> Basic login implementation
 
 @app.route('/upload', methods=['POST'])
+@login_required
 def upload():
     """When a file is POSTed to this endpoint, it is given
     a random name and a new Attachment object is saved.
 
     """
-    if not check_login():
-        abort(401)
-
     if len(request.files):
         attachment = create_attachment_from_file(
             request.files['file'],
@@ -93,6 +97,7 @@ def upload():
     )
     return response
 
+<<<<<<< HEAD
 @app.route('/subscriptions', methods=['GET'])
 def subscriptions():
     if not check_login():
@@ -102,3 +107,41 @@ def subscriptions():
 
     user_subs = m.Subscription.query.filter(m.Subscription.user_id==user_id).all()
     return jsonify(objects=[i.serialize for i in user_subs]), 200
+=======
+def isValidPassword(password):
+    if not password: 
+        return False
+    if len(password) < app.config['MIN_PASSWORD_LENGTH']:
+        return False
+    return True
+
+@app.route('/users', methods=['POST'])
+@login_required
+def users():
+    data = loads(request.data)
+    username = data.get("name", None)
+    password = data.get("password", None)
+    if username is None:
+        return jsonify(error='Invalid username'), 400
+    numUsers = m.User.query.filter(m.User.name == username).count()
+    if numUsers != 0:
+        return jsonify(error='Username taken'), 400
+    if password is None:
+        return jsonify(error='No password provided'), 400
+    if not isValidPassword(password):
+        return jsonify(error='Invalid password'), 400
+    user = m.User(name=username)
+    user.set_password(password)
+    m.db.session.add(user)
+    try:
+        m.db.session.commit()
+    except IntegrityError:
+        return jsonify(error='Could not add user'), 400
+    response = jsonify(
+        id=user.id,
+        created_at=str(user.created_at),
+        modified_at=str(user.modified_at),
+        name=user.name,
+    )
+    return response, 201
+>>>>>>> Basic login implementation

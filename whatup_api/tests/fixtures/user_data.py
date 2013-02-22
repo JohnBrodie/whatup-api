@@ -1,6 +1,7 @@
 """Fixtures for User model"""
 from datetime import datetime
 from fixture import DataSet
+from flaskext.bcrypt import generate_password_hash
 
 
 class UserData(DataSet):
@@ -13,7 +14,8 @@ class UserData(DataSet):
         bio = 'Little is known about Ayush. He is an enigma.'
         is_deleted = False
         email = 'enigma@ayush.me'
-        openid = 'openidkey'
+        pw_hash = generate_password_hash('password')
 
     class SpecifiesNone:
         name = 'John Doe'
+        pw_hash = generate_password_hash('password')
