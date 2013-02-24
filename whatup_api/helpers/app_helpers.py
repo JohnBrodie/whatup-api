@@ -80,8 +80,8 @@ def handle_revision_updates(put_data, instid):
     if not check_login():
         abort(401)
 
-    # if 'rev_id' is posted, we're reverting to 
-    # an existing revision, so no other fields should 
+    # if 'rev_id' is posted, we're reverting to
+    # an existing revision, so no other fields should
     # be present
     if 'rev_id' in put_data and len(put_data) > 1:
         abort(500)
@@ -105,9 +105,9 @@ def handle_revision_updates(put_data, instid):
         for tag in rev.tags:
             put_data['tags'].append({'id': tag.id})
 
-    revision = m.Revision(user_id = post.user_id, 
-                          post_id = post.id, 
-                          topic = post.topic, 
+    revision = m.Revision(user_id = post.user_id,
+                          post_id = post.id,
+                          topic = post.topic,
                           body = post.body)
 
     for tag in post.tags:

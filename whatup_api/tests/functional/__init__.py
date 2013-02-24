@@ -1,5 +1,6 @@
 """ Functional TestCase Setup """
 from json import dumps, loads
+from mock import Mock, patch
 
 from whatup_api.tests import _BaseApiTestCase
 
@@ -52,9 +53,15 @@ class _FunctionalTestCase(_BaseApiTestCase):
                     except IOError:
                         cls.post_data['file'] = None
 
-                response = cls.client.post(
-                    cls.endpoint, data=cls.post_data,
-                    headers=cls.post_headers)
+                mock_open = Mock()
+                mock_open.info.return_value = {}
+                mock_open.headers = {}
+                mock_open.read.return_value = 'asdf'
+                urlopen = Mock(return_value=mock_open)
+                with patch('whatup_api.helpers.app_helpers.urlopen', urlopen):
+                    response = cls.client.post(
+                        cls.endpoint, data=cls.post_data,
+                        headers=cls.post_headers)
 
             elif ('Content-Type', 'multipart/form-data') in cls.post_headers:
                 response = cls.client.post(
