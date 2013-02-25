@@ -49,7 +49,7 @@ class WhenCreatingNullUser(_FunctionalTestCase):
     expected_status = 400
     post_data = {'name': None}
 
-class WhenCreatingWithTooSmallPassword(_FunctionalTestCase):
+class WhenNewPasswordHasTooFewCharacters(_FunctionalTestCase):
 
     endpoint = '/users'
     expected_status = 400

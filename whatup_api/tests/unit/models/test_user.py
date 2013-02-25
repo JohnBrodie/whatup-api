@@ -60,6 +60,18 @@ class DescribeUserModel(UserModelTestCase):
     def should_have_nullable_email(self):
         self.assertEqual(self.SpecifiesNone.email, None)
 
+    def should_have_pw_hash(self):
+        self.assertEqual(self.Default.pw_hash, self.user_data.Default.pw_hash)
+
+    def should_have_pw_hash_as_string(self):
+        self.assertTrue(self.is_type('pw_hash', self.db.String))
+
+    def should_have_pw_hash_with_length(self):
+        self.assertEqual(self.get_length('pw_hash'), 80)
+
+    def should_have_non_nullable_pw_hash(self):
+        self.assertFalse(self.is_nullable('pw_hash'))
+
     def should_have_subscriptions(self):
         subscriptions = self.Default.subscriptions.all()
         self.assertEquals(len(subscriptions), 2)
