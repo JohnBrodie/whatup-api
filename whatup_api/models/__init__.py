@@ -17,6 +17,11 @@ def create_tables(app):
     db.metadata.create_all(engine)
     return engine
 
+def dump_datetime(value):
+    if value is None:
+        return None
+    return value.strftime("%Y-%m-%d")+'T'+value.strftime("%H:%M:%S")
+
 # These are required, even though pylint will say
 # otherwise.
 from whatup_api.models.user import User

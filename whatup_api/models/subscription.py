@@ -3,7 +3,7 @@ from sqlalchemy.orm import validates
 from sqlalchemy.sql import func
 
 from whatup_api.exceptions import APIError
-from whatup_api.models import db
+from whatup_api.models import db, dump_datetime
 
 subsTags = db.Table(
     'substags', db.metadata,
@@ -31,3 +31,16 @@ class Subscription(db.Model):
         if not name:
             raise APIError({key: 'Must specify user_id'})
         return name
+
+    @property
+    def serialize(self):
+       return {
+           'id'         : self.id,
+           'modified_at': dump_datetime(self.modified_at),
+           'created_at' : dump_datetime(self.modified_at),
+           'tags'       : self.serialize_tags
+       }
+
+    @property
+    def serialize_tags(self):
+       return [ item.serialize for item in self.tags]

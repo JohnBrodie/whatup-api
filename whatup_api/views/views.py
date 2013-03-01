@@ -92,3 +92,11 @@ def upload():
         location=attachment.location,
     )
     return response
+
+@app.route('/subscriptions/<int:user_id>', methods=['GET'])
+def subscriptions(user_id):
+    if not check_login():
+        abort(401)
+
+    user_subs = m.Subscription.query.filter(m.Subscription.user_id==user_id).all()
+    return jsonify(objects=[i.serialize for i in user_subs]), 200

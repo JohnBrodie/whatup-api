@@ -3,7 +3,7 @@ from sqlalchemy.orm import validates
 from sqlalchemy.sql import func
 
 from whatup_api.exceptions import APIError
-from whatup_api.models import db
+from whatup_api.models import db, dump_datetime
 
 
 class Tag(db.Model):
@@ -24,3 +24,12 @@ class Tag(db.Model):
         if not name:
             raise APIError({key: 'Must specify name'})
         return name
+
+    @property
+    def serialize(self):
+       return {
+           'id'         : self.id,
+           'user_id'    : self.user_id,
+           'summary'    : self.summary,
+           'name'       : self.name
+       }
