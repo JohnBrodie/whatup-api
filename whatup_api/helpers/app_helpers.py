@@ -45,7 +45,10 @@ def configure_logging(app):
     try:
         logging.config.fileConfig('/var/lib/jenkins/jobs/whatup-api/workspace/setup.cfg')
     except NoSectionError:
-        logging.config.fileConfig('../../setup.cfg')
+        try:
+            logging.config.fileConfig('../../setup.cfg')
+        except NoSectionError:
+            logging.config.fileConfig('setup.cfg')
 
     log = logging.getLogger('whatupAPI')
     app.logger.addHandler(log)

@@ -63,7 +63,7 @@ class WhenURLIsOversizeFile(_FunctionalTestCase):
     endpoint = '/upload'
 
 
-class WhenURLIsFake(_FunctionalTestCase):
+class WhenURLIsInvalid(_FunctionalTestCase):
     post_headers = [('Content-Type', 'multipart/form-data')]
     post_data = {'url': 'jijijijijijijjijijijfjffjfjjfjfjffffj.net'}
     expected_status = 400
@@ -80,3 +80,29 @@ class WhenOmittingFile(_FunctionalTestCase):
 
     def should_return_no_file_error(self):
         self.assertEqual('No files in request', self.json['error'])
+
+class WhenDeletingFile(_FunctionalTestCase):
+    delete = True
+    expected_status = 200
+    endpoint = '/attachments/1'
+    filepath = config.ATTACHMENTS_DIR + '/' + 'randomstring'
+    if not os.path.exists(config.ATTACHMENTS_DIR):
+        os.makedirs(config.ATTACHMENTS_DIR)
+    open(filepath, 'w').close()
+
+    def should_have_deleted_file(self):
+        try:
+            f = open(self.filepath)
+            f.close()
+            self.assertFalse(True)
+        except IOError:
+            self.assertTrue(True)
+
+    @classmethod
+    def tearDownClass(cls):
+        rmtree(config.ATTACHMENTS_DIR)
+
+class WhenDeletingNonExistentFile(_FunctionalTestCase):
+    delete = True
+    expected_status = 400
+    endpoint = '/attachments/999'

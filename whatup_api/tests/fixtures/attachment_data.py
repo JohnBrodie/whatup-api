@@ -14,10 +14,10 @@ class AttachmentData(DataSet):
         uploader = UserData.Default
         post = PostData.Default
         name = "file.file"
-        location = "file/file/file_1.file"
+        location = "randomstring"
 
     class SpecifiesNone:
         uploader = UserData.Default
         post = PostData.Default
         name = "file.file"
-        location = "file/file/file_1.file"
+        location = "randomstring"

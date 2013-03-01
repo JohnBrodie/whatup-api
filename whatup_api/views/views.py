@@ -1,3 +1,5 @@
+import os
+
 from flask import request, abort, jsonify, redirect
 from sqlalchemy.exc import IntegrityError
 
@@ -24,6 +26,29 @@ def is_logged_in():
     is_logged_in = check_login()
     return jsonify(is_logged_in=is_logged_in)
 
+
+@app.route('/attachments/<int:attachment_id>', methods=['DELETE'])
+def delete_attachment(attachment_id):
+    if not check_login():
+        abort(401)
+
+    attachment = m.Attachment.query.get(attachment_id)
+    if attachment is None:
+        return jsonify(error='There is no attachment with id ' + str(attachment_id)), 400
+
+    upload_dir = app.config['ATTACHMENTS_DIR']
+    filename = attachment.location
+    try:
+        os.remove('/'.join([upload_dir, filename]))
+    except OSError:
+        return jsonify(error='Could not find file'), 400
+
+    try:
+        m.db.session.delete(attachment)
+        m.db.session.commit()
+    except IntegrityError:
+        abort(400)
+    return jsonify(status='File deleted'), 200
 
 @app.route('/upload', methods=['POST'])
 def upload():
