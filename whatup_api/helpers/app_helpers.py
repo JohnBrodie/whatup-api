@@ -194,6 +194,7 @@ def create_api(app):
             'is_deleted',
             'owner.is_deleted',
             'subscribee.is_deleted',
+            'tags.is_deleted',
         ],
         authentication_required_for=ALL_HTTP_METHODS,
         authentication_function=check_login,
