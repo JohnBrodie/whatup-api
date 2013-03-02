@@ -32,3 +32,15 @@ class User(db.Model):
         if not name:
             raise APIError({key: 'Must specify name'})
         return name
+
+    @property
+    def serialize(self):
+       return {
+            'id'    : self.id,
+            'name'  : self.name,
+            'email' : self.email,
+            'alias' : self.alias,
+            'bio'   : self.bio
+       }
+
+

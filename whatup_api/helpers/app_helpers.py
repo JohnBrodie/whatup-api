@@ -189,14 +189,14 @@ def create_api(app):
     )
     manager.create_api(
         m.Subscription,
-        methods=ALL_HTTP_METHODS,
+        methods=['POST', 'PATCH', 'PUT', 'DELETE'],
         exclude_columns=[
             'is_deleted',
             'owner.is_deleted',
             'subscribee.is_deleted',
             'tags.is_deleted',
         ],
-        authentication_required_for=ALL_HTTP_METHODS,
+        authentication_required_for=['POST', 'PATCH', 'PUT', 'DELETE'],
         authentication_function=check_login,
         validation_exceptions=validation_exceptions,
         post_form_preprocessor=add_user_to_request,

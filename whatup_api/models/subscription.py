@@ -38,6 +38,7 @@ class Subscription(db.Model):
            'id'         : self.id,
            'modified_at': dump_datetime(self.modified_at),
            'created_at' : dump_datetime(self.modified_at),
+           'subscribee' : self.subscribee.serialize if self.subscribee is not None else None,
            'tags'       : self.serialize_tags
        }
 

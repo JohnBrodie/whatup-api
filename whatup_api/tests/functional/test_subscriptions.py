@@ -23,10 +23,6 @@ class WhenGettingSubscriptionByID(_FunctionalTestCase):
         self.assertEquals(set(user_subs), set(returned_subs))
 
 
-class WhenGettingSubscriptionWithInvalidID(_NotFoundTestCase):
-    endpoint = '/subscriptions/999'
-
-
 class WhenCreatingValidSubscription(_FunctionalTestCase):
 
     endpoint = '/subscriptions'
