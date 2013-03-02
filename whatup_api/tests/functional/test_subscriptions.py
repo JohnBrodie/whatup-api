@@ -15,7 +15,7 @@ class WhenGettingSubscriptionsIndex(_FunctionalTestCase):
 class WhenGettingSubscriptionByID(_FunctionalTestCase):
 
     expected_status = 200
-    endpoint = '/subscriptions/1'
+    endpoint = '/subscriptions'
 
     def should_return_users_subscriptions(self):
         user_subs = [1, 2]
@@ -23,11 +23,8 @@ class WhenGettingSubscriptionByID(_FunctionalTestCase):
         self.assertEquals(set(user_subs), set(returned_subs))
 
 
-class WhenGettingSubscriptionWithInvalidID(_FunctionalTestCase):
+class WhenGettingSubscriptionWithInvalidID(_NotFoundTestCase):
     endpoint = '/subscriptions/999'
-    expected_status = 200
-    def should_return_empty_list(self):
-        self.assertEquals(self.json['objects'], [])
 
 
 class WhenCreatingValidSubscription(_FunctionalTestCase):

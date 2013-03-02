@@ -1,6 +1,6 @@
 import os
 
-from flask import request, abort, jsonify, redirect
+from flask import request, abort, jsonify, redirect, g
 from sqlalchemy.exc import IntegrityError
 
 from whatup_api.app import app
@@ -93,10 +93,12 @@ def upload():
     )
     return response
 
-@app.route('/subscriptions/<int:user_id>', methods=['GET'])
-def subscriptions(user_id):
+@app.route('/subscriptions', methods=['GET'])
+def subscriptions():
     if not check_login():
         abort(401)
+
+    user_id = g.user.id
 
     user_subs = m.Subscription.query.filter(m.Subscription.user_id==user_id).all()
     return jsonify(objects=[i.serialize for i in user_subs]), 200
