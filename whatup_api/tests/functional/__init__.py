@@ -89,6 +89,15 @@ class _FunctionalTestCase(_BaseApiTestCase):
 
         return response
 
+    @classmethod
+    def getKeys(cls, dictIn):
+        keys = []
+        for key, value in dictIn.iteritems():
+            keys.append(key)
+            if isinstance(value, dict):
+                keys += cls.getKeys(value)
+        return keys
+
     def should_have_status(self):
         self.assertEqual(self.response.status_code, self.expected_status)
 
@@ -96,7 +105,18 @@ class _FunctionalTestCase(_BaseApiTestCase):
         self.assertEqual(self.response.content_type, self.expected_content_type)
 
     def should_not_return_is_deleted(self):
-        self.assertNotIn('is_deleted', self.response.data)
+        try:
+            json = loads(self.response.data)
+            self.assertNotIn('is_deleted', self.getKeys(json))
+        except ValueError:
+            self.assertTrue(True)
+
+    def should_not_return_pw_hash(self):
+        try:
+            json = loads(self.response.data)
+            self.assertNotIn('pw_hash', self.getKeys(json))
+        except ValueError:
+            self.assertTrue(True)
 
     def should_return_401_status_code_if_not_logged_in(self):
         self.logout()

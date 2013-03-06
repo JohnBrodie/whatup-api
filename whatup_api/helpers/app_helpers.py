@@ -136,6 +136,7 @@ def create_api(app):
         exclude_columns=[
             'is_deleted',
             'author.is_deleted',
+            'author.pw_hash',
             'attachments.is_deleted',
             'revisions.is_deleted',
             'tags.is_deleted',
@@ -151,6 +152,7 @@ def create_api(app):
         m.User,
         methods=['GET', 'PATCH', 'PUT', 'DELETE'],
         exclude_columns=[
+            'pw_hash',
             'is_deleted',
             'tags_created.is_deleted',
             'subscriptions.is_deleted',
@@ -170,6 +172,7 @@ def create_api(app):
         exclude_columns=[
             'is_deleted',
             'author.is_deleted',
+            'author.pw_hash',
         ],
         validation_exceptions=validation_exceptions,
         authentication_required_for=ALL_HTTP_METHODS,
@@ -182,7 +185,9 @@ def create_api(app):
         exclude_columns=[
             'is_deleted',
             'owner.is_deleted',
+            'owner.pw_hash',
             'subscribee.is_deleted',
+            'subscribee.pw_hash',
             'tags.is_deleted',
         ],
         authentication_required_for=['POST', 'PATCH', 'PUT', 'DELETE'],
