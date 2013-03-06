@@ -2,7 +2,7 @@ import os
 
 from flask import request, abort, jsonify, redirect, g
 from sqlalchemy.exc import IntegrityError
-from flask.ext.login import login_required
+from flask.ext.login import login_required, current_user
 
 from whatup_api.app import app
 from whatup_api import models as m
@@ -30,8 +30,8 @@ def is_logged_in():
     return jsonify(is_logged_in=is_logged_in)
 
 
-<<<<<<< HEAD
 @app.route('/attachments/<int:attachment_id>', methods=['DELETE'])
+@login_required
 def delete_attachment(attachment_id):
     if not check_login():
         abort(401)
@@ -53,8 +53,6 @@ def delete_attachment(attachment_id):
     except IntegrityError:
         abort(400)
     return jsonify(status='File deleted'), 200
-=======
->>>>>>> Basic login implementation
 
 @app.route('/upload', methods=['POST'])
 @login_required
@@ -97,17 +95,13 @@ def upload():
     )
     return response
 
-<<<<<<< HEAD
 @app.route('/subscriptions', methods=['GET'])
+@login_required
 def subscriptions():
-    if not check_login():
-        abort(401)
-
-    user_id = g.user.id
-
+    user_id = current_user.id
     user_subs = m.Subscription.query.filter(m.Subscription.user_id==user_id).all()
     return jsonify(objects=[i.serialize for i in user_subs]), 200
-=======
+
 def isValidPassword(password):
     if not password: 
         return False
@@ -144,4 +138,3 @@ def users():
         name=user.name,
     )
     return response, 201
->>>>>>> Basic login implementation
