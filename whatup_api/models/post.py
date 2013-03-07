@@ -3,7 +3,7 @@ from sqlalchemy.orm import validates
 from sqlalchemy.sql import func
 
 from whatup_api.exceptions import APIError
-from whatup_api.models import db
+from whatup_api.models import db, dump_datetime
 
 postTags = db.Table('posttags', db.metadata,
                     db.Column('post', db.Integer, db.ForeignKey('posts.id')),
@@ -34,3 +34,19 @@ class Post(db.Model):
         if not body:
             raise APIError({key: 'Must specify body'})
         return body
+
+    @property
+    def serialize(self):
+       return {
+            'id'         : self.id,
+            'modified_at': dump_datetime(self.modified_at),
+            'created_at' : dump_datetime(self.created_at),
+            'topic'      : self.topic,
+            'body'       : self.body,
+            'user_id'    : self.user_id,
+            'tags'       : self.serialize_tags
+       }
+
+    @property
+    def serialize_tags(self):
+       return [ item.serialize for item in self.tags]

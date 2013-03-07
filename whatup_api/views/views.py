@@ -4,6 +4,8 @@ from flask import request, abort, jsonify, redirect, g
 from sqlalchemy.exc import IntegrityError
 from flask.ext.login import login_required, current_user
 
+from math import ceil
+
 from whatup_api.app import app
 from whatup_api import models as m
 from whatup_api.helpers.app_helpers import (
@@ -138,3 +140,31 @@ def users():
         name=user.name,
     )
     return response, 201
+
+@app.route('/subscribed', methods=['GET'])
+@login_required
+def subscribed():
+    page = request.args.get('page', 1)
+    page_length = app.config['SUBS_PAGE_LENGTH']
+
+    posts = set()
+
+    user_id = current_user.id
+    user_subs = m.Subscription.query.filter(m.Subscription.user_id==user_id).all()
+    for sub in user_subs:
+        if sub.tags:
+            sub_posts = m.Post.query.join(m.Post.tags).filter(m.Tag.id.in_([s.id for s in sub.tags]))
+        if sub.subscribee is not None:
+            sub_posts = sub_posts.filter(m.Post.author == sub.subscribee)
+        posts |= set(sub_posts.all())
+
+    postlist = list(posts)
+    postlist.sort(key=lambda x: x.created_at, reverse=True)
+    postlist = postlist[page_length*(page-1):page_length*(page)]
+    response = {}
+    response['total_pages'] = int(ceil(len(postlist)/float(page_length)))
+    response['num_results'] = len(postlist)
+    response['page'] = page
+    response['objects'] = [i.serialize for i in postlist]
+
+    return jsonify(response), 200
