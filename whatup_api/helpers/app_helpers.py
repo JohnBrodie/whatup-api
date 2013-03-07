@@ -8,7 +8,7 @@ from urllib import unquote
 from os.path import basename
 from urlparse import urlsplit
 from ConfigParser import NoSectionError
-from flask import abort, g, session
+from flask import abort
 from flask.ext.restless import APIManager
 from os import environ
 from flask.ext.login import current_user
@@ -22,6 +22,7 @@ from whatup_api import prod_config
 from whatup_api import models as m
 from whatup_api.exceptions import APIError
 
+
 def check_login():
     """Check if user is logged in. This function
     should be used as the `authentication_function` for all
@@ -30,14 +31,16 @@ def check_login():
     """
     return current_user.is_authenticated()
 
+
 def configure_logging(app):
     """Set up logging, tests and running app
     have different paths.
 
     """
-    try:
-        logging.config.fileConfig('/var/lib/jenkins/jobs/whatup-api/workspace/setup.cfg')
-    except NoSectionError:
+    cfg = os.environ.get('WHATUPAPI_CFG')
+    if cfg:
+        logging.config.fileConfig(cfg)
+    else:
         try:
             logging.config.fileConfig('../../setup.cfg')
         except NoSectionError:
@@ -73,8 +76,8 @@ def handle_revision_updates(put_data, instid):
     original content of the post
 
     """
-    # if 'rev_id' is posted, we're reverting to 
-    # an existing revision, so no other fields should 
+    # if 'rev_id' is posted, we're reverting to
+    # an existing revision, so no other fields should
     # be present
     if 'rev_id' in put_data and len(put_data) > 1:
         abort(500)
@@ -98,10 +101,10 @@ def handle_revision_updates(put_data, instid):
         for tag in rev.tags:
             put_data['tags'].append({'id': tag.id})
 
-    revision = m.Revision(user_id = post.user_id,
-                          post_id = post.id,
-                          topic = post.topic,
-                          body = post.body)
+    revision = m.Revision(user_id=post.user_id,
+                          post_id=post.id,
+                          topic=post.topic,
+                          body=post.body)
 
     for tag in post.tags:
         revision.tags.append(tag)
