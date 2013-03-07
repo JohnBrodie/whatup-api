@@ -2,6 +2,7 @@ import logging
 import logging.config
 import os
 
+from math import ceil
 from base64 import urlsafe_b64encode
 from urllib2 import urlopen
 from urllib import unquote
@@ -260,3 +261,13 @@ def create_attachment_from_url(url, config):
         name=original_name,
         location=filename,
     )
+
+def serialize_and_paginate(objlist, page_length, page):
+    response = {}
+    objlist.sort(key=lambda x: x.created_at, reverse=True)
+    response['total_pages'] = int(ceil(len(objlist)/float(page_length)))
+    response['num_results'] = len(objlist)
+    objlist = objlist[page_length*(page-1):page_length*(page)]
+    response['page'] = page
+    response['objects'] = [i.serialize for i in objlist]
+    return response

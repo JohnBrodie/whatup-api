@@ -4,14 +4,13 @@ from flask import request, abort, jsonify, redirect, g
 from sqlalchemy.exc import IntegrityError
 from flask.ext.login import login_required, current_user
 
-from math import ceil
-
 from whatup_api.app import app
 from whatup_api import models as m
 from whatup_api.helpers.app_helpers import (
     check_login,
     create_attachment_from_url,
-    create_attachment_from_file
+    create_attachment_from_file,
+    serialize_and_paginate
 )
 
 from json import loads
@@ -101,8 +100,10 @@ def upload():
 @login_required
 def subscriptions():
     user_id = current_user.id
+    page = int(request.args.get('page', 1))
     user_subs = m.Subscription.query.filter(m.Subscription.user_id==user_id).all()
-    return jsonify(objects=[i.serialize for i in user_subs]), 200
+    response = serialize_and_paginate(user_subs, app.config['SUBS_PAGE_LENGTH'], page)
+    return jsonify(response), 200
 
 def isValidPassword(password):
     if not password: 
@@ -159,12 +160,5 @@ def subscribed():
         posts |= set(sub_posts.all())
 
     postlist = list(posts)
-    postlist.sort(key=lambda x: x.created_at, reverse=True)
-    response = {}
-    response['total_pages'] = int(ceil(len(postlist)/float(page_length)))
-    response['num_results'] = len(postlist)
-    response['page'] = page
-    postlist = postlist[page_length*(page-1):page_length*(page)]
-    response['objects'] = [i.serialize for i in postlist]
-
+    response = serialize_and_paginate(postlist, page_length, page)
     return jsonify(response), 200
