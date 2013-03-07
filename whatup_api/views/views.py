@@ -144,7 +144,7 @@ def users():
 @app.route('/subscribed', methods=['GET'])
 @login_required
 def subscribed():
-    page = request.args.get('page', 1)
+    page = int(request.args.get('page', 1))
     page_length = app.config['SUBS_PAGE_LENGTH']
 
     posts = set()
@@ -160,11 +160,11 @@ def subscribed():
 
     postlist = list(posts)
     postlist.sort(key=lambda x: x.created_at, reverse=True)
-    postlist = postlist[page_length*(page-1):page_length*(page)]
     response = {}
     response['total_pages'] = int(ceil(len(postlist)/float(page_length)))
     response['num_results'] = len(postlist)
     response['page'] = page
+    postlist = postlist[page_length*(page-1):page_length*(page)]
     response['objects'] = [i.serialize for i in postlist]
 
     return jsonify(response), 200
