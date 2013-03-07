@@ -1,6 +1,6 @@
 from flask import (
     abort, flash, g, redirect,
-    render_template, request, session,
+    render_template, request, jsonify,
     url_for,
 )
 
