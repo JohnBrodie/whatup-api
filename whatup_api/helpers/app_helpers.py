@@ -263,6 +263,7 @@ def create_attachment_from_url(url, config):
     )
 
 def serialize_and_paginate(objlist, page_length, page):
+    objlist = [obj for obj in objlist if not obj.is_deleted]
     response = {}
     objlist.sort(key=lambda x: x.created_at, reverse=True)
     response['total_pages'] = int(ceil(len(objlist)/float(page_length)))

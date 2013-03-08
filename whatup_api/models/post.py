@@ -43,10 +43,6 @@ class Post(db.Model):
             'created_at' : dump_datetime(self.created_at),
             'topic'      : self.topic,
             'body'       : self.body,
-            'user_id'    : self.user_id,
-            'tags'       : self.serialize_tags
+            'author'     : self.author.serialize,
+            'tags'       : [ item.serialize for item in self.tags]
        }
-
-    @property
-    def serialize_tags(self):
-       return [ item.serialize for item in self.tags]

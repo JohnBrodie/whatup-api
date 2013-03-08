@@ -3,6 +3,7 @@ import os
 from flask import request, abort, jsonify, redirect, g
 from sqlalchemy.exc import IntegrityError
 from flask.ext.login import login_required, current_user
+from sqlalchemy import and_
 
 from whatup_api.app import app
 from whatup_api import models as m
@@ -34,9 +35,6 @@ def is_logged_in():
 @app.route('/attachments/<int:attachment_id>', methods=['DELETE'])
 @login_required
 def delete_attachment(attachment_id):
-    if not check_login():
-        abort(401)
-
     attachment = m.Attachment.query.get(attachment_id)
     if attachment is None:
         return jsonify(error='There is no attachment with id ' + str(attachment_id)), 400
@@ -101,7 +99,7 @@ def upload():
 def subscriptions():
     user_id = current_user.id
     page = int(request.args.get('page', 1))
-    user_subs = m.Subscription.query.filter(m.Subscription.user_id==user_id).all()
+    user_subs = m.Subscription.query.filter(and_(m.Subscription.user_id==user_id, m.Subscription.is_deleted == False)).all()
     response = serialize_and_paginate(user_subs, app.config['SUBS_PAGE_LENGTH'], page)
     return jsonify(response), 200
 
@@ -151,13 +149,20 @@ def subscribed():
     posts = set()
 
     user_id = current_user.id
-    user_subs = m.Subscription.query.filter(m.Subscription.user_id==user_id).all()
+    user_subs = m.Subscription.query.filter(and_(m.Subscription.user_id==user_id, m.Subscription.is_deleted == False)).all()
     for sub in user_subs:
-        if sub.tags:
-            sub_posts = m.Post.query.join(m.Post.tags).filter(m.Tag.id.in_([s.id for s in sub.tags]))
+        criteria = None
+        if sub.tags.count() > 0:
+            criteria = m.Post.tags.contains(sub.tags[0])
+            for tag in sub.tags[1:]:
+                criteria = and_(criteria, m.Post.tags.contains(tag))
         if sub.subscribee is not None:
-            sub_posts = sub_posts.filter(m.Post.author == sub.subscribee)
-        posts |= set(sub_posts.all())
+            if criteria is None:
+                criteria = m.Post.user_id == sub.subscribee.id
+            else:
+                criteria = and_(criteria, m.Post.user_id == sub.subscribee.id)
+        sub_posts = m.Post.query.filter(criteria).all() if criteria is not None else []
+        posts |= set(sub_posts)
 
     postlist = list(posts)
     response = serialize_and_paginate(postlist, page_length, page)
