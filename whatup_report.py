@@ -12,7 +12,7 @@ from os.path import expanduser
 #toaddr = ['theownage@gmail.com']
 toaddr = ['project-whatup@googlegroups.com', 'jks29@drexel.edu']
 base_address = 'http://api.projectwhatup.us/posts'
-base_view_address = 'http://arena.projectwhatup.us/#/posts/view/'
+base_view_address = 'http://projectwhatup.us/#/posts/view/'
 
 config = ConfigParser.RawConfigParser(allow_no_value=True)
 config_file = expanduser('~/.checksite.cfg')
