@@ -100,7 +100,7 @@ def subscriptions():
     user_id = current_user.id
     page = int(request.args.get('page', 1))
     user_subs = m.Subscription.query.filter(and_(m.Subscription.user_id==user_id, m.Subscription.is_deleted == False)).all()
-    response = serialize_and_paginate(user_subs, app.config['SUBS_PAGE_LENGTH'], page)
+    response = serialize_and_paginate(user_subs, app.config['PAGE_LENGTH'], page)
     return jsonify(response), 200
 
 def isValidPassword(password):
@@ -144,7 +144,7 @@ def users():
 @login_required
 def subscribed():
     page = int(request.args.get('page', 1))
-    page_length = app.config['SUBS_PAGE_LENGTH']
+    page_length = app.config['PAGE_LENGTH']
 
     posts = set()
 
@@ -166,4 +166,15 @@ def subscribed():
 
     postlist = list(posts)
     response = serialize_and_paginate(postlist, page_length, page)
+    return jsonify(response), 200
+
+@app.route('/posts/<post_id>/revisions', methods=['GET'])
+@login_required
+def subscribed(post_id):
+    page = int(request.args.get('page', 1))
+    page_length = app.config['PAGE_LENGTH']
+    post = m.Post.query.get(post_id)
+    if post is None:
+        return jsonify(error='There is no post with id ' + str(post_id)), 400
+    response = serialize_and_paginate(post.revisions, page_length, page)
     return jsonify(response), 200
