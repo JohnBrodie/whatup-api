@@ -170,7 +170,7 @@ def subscribed():
 
 @app.route('/posts/<post_id>/revisions', methods=['GET'])
 @login_required
-def subscribed(post_id):
+def post_revisions(post_id):
     page = int(request.args.get('page', 1))
     page_length = app.config['PAGE_LENGTH']
     post = m.Post.query.get(post_id)
