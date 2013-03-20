@@ -164,6 +164,7 @@ def create_api(app):
             'attachments.is_deleted',
             'revisions.is_deleted',
             'tags.is_deleted',
+            'posts',
         ],
         authentication_required_for=['GET', 'PATCH', 'PUT', 'DELETE'],
         authentication_function=check_login,
