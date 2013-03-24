@@ -15,6 +15,7 @@ class Tag(db.Model):
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     modified_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    creator = db.relationship('User')
     summary = db.Column(db.String(100))
     name = db.Column(db.String(100), unique=True, nullable=False)
     is_deleted = db.Column(db.Boolean, default=False, nullable=False)

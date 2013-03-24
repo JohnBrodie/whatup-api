@@ -19,6 +19,7 @@ class Revision(db.Model):
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     modified_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    author = db.relationship('User')
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=True)
     body = db.Column(db.String(1000), nullable=False)
     topic = db.Column(db.String(1000), nullable=False)

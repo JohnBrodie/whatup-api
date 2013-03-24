@@ -10,11 +10,11 @@ class TagData(DataSet):
     class Default:
         created_at = datetime(2001, 10, 10)
         modified_at = datetime(2001, 10, 11)
-        author = UserData.Default
+        creator = UserData.Default
         summary = 'summary goes here'
         name = 'defaulttagname'
         is_deleted = False
 
     class SpecifiesNone:
-        author = UserData.Default
+        creator = UserData.Default
         name = 'specifiesnonetagname'

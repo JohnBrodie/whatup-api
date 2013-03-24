@@ -11,7 +11,7 @@ class TagModelTestCase(_ModelTestCase):
     model_name = 'Tag'
 
 
-class DescribePostModel(TagModelTestCase):
+class DescribeTagModel(TagModelTestCase):
 
     def should_have_name(self):
         self.assertEquals(self.Default.name, self.tag_data.Default.name)
@@ -34,9 +34,9 @@ class DescribePostModel(TagModelTestCase):
     def should_have_summary_with_length(self):
         self.assertEquals(self.get_length('summary'), 100)
 
-    def should_have_author(self):
-        author = self.Default.author
-        self.assertEqual(author.id, self.user_data.Default.id)
+    def should_have_creator(self):
+        creator = self.Default.creator
+        self.assertEqual(creator.id, self.user_data.Default.id)
 
     def should_have_name_validation_return_name(self):
         name = 'name here'

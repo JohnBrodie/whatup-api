@@ -13,6 +13,7 @@ from flask import abort
 from flask.ext.restless import APIManager
 from os import environ
 from flask.ext.login import current_user
+import datetime
 from sqlalchemy.exc import (
     ArgumentError, IntegrityError,
     OperationalError, InvalidRequestError
@@ -71,6 +72,14 @@ def add_user_to_request(post_data):
     post_data['user_id'] = current_user.id
     return post_data
 
+def add_user_to_post(post_data):
+    """ Add the current user to post data
+    before passing the request on to the model.
+
+    """
+    post_data['created_by_id'] = current_user.id
+    post_data['last_modified_by_id'] = current_user.id
+    return post_data
 
 def handle_revision_updates(put_data, instid):
     """ If a post is being modified, save the
@@ -102,17 +111,21 @@ def handle_revision_updates(put_data, instid):
         for tag in rev.tags:
             put_data['tags'].append({'id': tag.id})
 
-    revision = m.Revision(user_id=post.user_id,
+    revision = m.Revision(user_id=post.last_modified_by_id,
                           post_id=post.id,
                           topic=post.topic,
-                          body=post.body)
+                          body=post.body,
+                          created_at=post.modified_at,
+                          modified_at=post.modified_at,
+                         )
 
     for tag in post.tags:
         revision.tags.append(tag)
 
     put_data.pop('revisions', None)
     post.revisions.append(revision)
-    put_data['user_id'] = current_user.id
+    put_data['last_modified_by_id'] = current_user.id
+    put_data['modified_at'] = str(datetime.datetime.now())
     try:
         m.db.session.add(revision)
         m.db.session.commit()
@@ -139,8 +152,10 @@ def create_api(app):
         methods=ALL_HTTP_METHODS,
         exclude_columns=[
             'is_deleted',
-            'author.is_deleted',
-            'author.pw_hash',
+            'created_by.is_deleted',
+            'created_by.pw_hash',
+            'last_modified_by.is_deleted',
+            'last_modified_by.pw_hash',
             'attachments.is_deleted',
             'revisions.is_deleted',
             'tags.is_deleted',
@@ -148,7 +163,7 @@ def create_api(app):
         authentication_required_for=ALL_HTTP_METHODS,
         authentication_function=check_login,
         validation_exceptions=validation_exceptions,
-        post_form_preprocessor=add_user_to_request,
+        post_form_preprocessor=add_user_to_post,
         put_form_preprocessor=handle_revision_updates,
         url_prefix=PREFIX,
     )
@@ -158,14 +173,6 @@ def create_api(app):
         exclude_columns=[
             'pw_hash',
             'is_deleted',
-            'tags_created.is_deleted',
-            'subscriptions.is_deleted',
-            'posts.is_deleted',
-            'revisions',
-            'subscriptions',
-            'attachments',
-            'posts',
-            'tags_created',
         ],
         authentication_required_for=['GET', 'PATCH', 'PUT', 'DELETE'],
         authentication_function=check_login,
@@ -177,8 +184,8 @@ def create_api(app):
         methods=ALL_HTTP_METHODS,
         exclude_columns=[
             'is_deleted',
-            'author.is_deleted',
-            'author.pw_hash',
+            'creator.is_deleted',
+            'creator.pw_hash',
         ],
         validation_exceptions=validation_exceptions,
         authentication_required_for=ALL_HTTP_METHODS,

@@ -21,7 +21,13 @@ class Post(db.Model):
     modified_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     topic = db.Column(db.String(1000), default='Untitled', nullable=False)
     body = db.Column(db.String(1000), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_by = db.relationship('User', primaryjoin="User.id==Post.created_by_id")
+
+    last_modified_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    last_modified_by = db.relationship('User', primaryjoin="User.id==Post.last_modified_by_id")
+
     tags = db.relationship("Tag", secondary=lambda: postTags, lazy='dynamic')
     revisions = db.relationship('Revision', backref='post', lazy='dynamic')
     is_deleted = db.Column(db.Boolean, default=False, nullable=False)
@@ -38,11 +44,12 @@ class Post(db.Model):
     @property
     def serialize(self):
        return {
-            'id'         : self.id,
-            'modified_at': dump_datetime(self.modified_at),
-            'created_at' : dump_datetime(self.created_at),
-            'topic'      : self.topic,
-            'body'       : self.body,
-            'author'     : self.author.serialize,
-            'tags'       : [ item.serialize for item in self.tags]
+            'id'                : self.id,
+            'modified_at'       : dump_datetime(self.modified_at),
+            'created_at'        : dump_datetime(self.created_at),
+            'topic'             : self.topic,
+            'body'              : self.body,
+            'created_by'        : self.created_by.serialize,
+            'last_modified_by'  : self.last_modified_by.serialize,
+            'tags'              : [ item.serialize for item in self.tags]
        }

@@ -23,15 +23,15 @@ class DescribeSubscriptionModel(SubscriptionModelTestCase):
     def should_have_non_nullable_user_id(self):
         self.assertFalse(self.is_nullable('user_id'))
 
-    def should_have_user(self):
+    def should_have_owner(self):
         self.assertEquals(self.Default.user,
-                          self.subscription_data.Default.user)
+                          self.subscription_data.Default.owner)
 
-    def should_have_user_as_integer(self):
-        self.assertTrue(self.is_type('user', self.db.Integer))
+    def should_have_subscribee_id_as_integer(self):
+        self.assertTrue(self.is_type('subscribee_id', self.db.Integer))
 
-    def should_have_user_as_nullable(self):
-        self.assertTrue(self.is_nullable('user'))
+    def should_have_subscribee_id_as_nullable(self):
+        self.assertTrue(self.is_nullable('subscribee_id'))
 
     def should_have_owner(self):
         owner = self.Default.owner

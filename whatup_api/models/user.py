@@ -19,12 +19,6 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(100))
     alias = db.Column(db.String(255))
     bio = db.Column(db.String(255))
-    subscriptions = db.relationship('Subscription', backref='owner',
-                                    lazy='dynamic', primaryjoin="User.id==Subscription.user_id")
-    tags_created = db.relationship('Tag', backref='author', lazy='dynamic')
-    attachments = db.relationship('Attachment', backref='uploader', lazy='dynamic')
-    posts = db.relationship('Post', backref='author', lazy='dynamic')
-    revisions = db.relationship('Revision', backref='author', lazy='dynamic')
     is_deleted = db.Column(db.Boolean, default=False, nullable=False)
     is_activated = db.Column(db.Boolean, default=True, nullable=False)
     pw_hash = db.Column(db.String(80), nullable=False)

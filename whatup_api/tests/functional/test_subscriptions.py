@@ -81,10 +81,10 @@ class WhenEditingSubscriptions(_FunctionalTestCase):
 
     endpoint = '/subscriptions/1'
     expected_status = 200
-    put_data = {'user': 2}
+    put_data = {'subscribee_id': 2}
 
     def should_return_edited_subscription_data(self):
-        self.assertEqual(self.put_data['user'], self.json['user'])
+        self.assertEqual(self.put_data['subscribee_id'], self.json['subscribee_id'])
 
 
 class WhenEditingSubscriptionWithInvalidID(_FunctionalTestCase):
@@ -92,7 +92,7 @@ class WhenEditingSubscriptionWithInvalidID(_FunctionalTestCase):
     endpoint = '/subscriptions/999'
     expected_status = 404
     expected_content_type = 'application/json'
-    put_data = {'user': 2}
+    put_data = {'subscribee_id': 2}
 
     def should_return_404(self):
         self.assertEqual(self.json['error'], '404 Not Found')

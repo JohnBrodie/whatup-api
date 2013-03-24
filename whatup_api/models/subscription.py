@@ -21,9 +21,10 @@ class Subscription(db.Model):
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     modified_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    owner = db.relationship('User', primaryjoin="User.id==Subscription.user_id")
+    subscribee_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    subscribee = db.relationship('User', primaryjoin="User.id==Subscription.subscribee_id")
     tags = db.relationship("Tag", secondary=lambda: subsTags, lazy='dynamic')
-    user = db.Column(db.Integer, db.ForeignKey('users.id'))
-    subscribee = db.relationship('User', primaryjoin="User.id==Subscription.user")
     is_deleted = db.Column(db.Boolean, default=False, nullable=False)
 
     @validates('user_id')
