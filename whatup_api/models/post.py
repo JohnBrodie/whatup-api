@@ -41,6 +41,12 @@ class Post(db.Model):
             raise APIError({key: 'Must specify body'})
         return body
 
+    @validates('topic')
+    def validate_topic(self, key, topic):
+        if not topic:
+            raise APIError({key: 'Must specify topic'})
+        return topic 
+
     @property
     def serialize(self):
        return {
