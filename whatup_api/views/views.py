@@ -151,17 +151,18 @@ def subscribed():
     user_id = current_user.id
     user_subs = m.Subscription.query.filter(and_(m.Subscription.user_id==user_id, m.Subscription.is_deleted == False)).all()
     for sub in user_subs:
-        criteria = None
-        if sub.tags.count() > 0:
-            criteria = m.Post.tags.contains(sub.tags[0])
-            for tag in sub.tags[1:]:
-                criteria = and_(criteria, m.Post.tags.contains(tag))
+        criteria = "true"
+        for tag in sub.tags:
+            criteria = and_(criteria, m.Post.tags.contains(tag))
         if sub.subscribee is not None:
-            if criteria is None:
-                criteria = m.Post.user_id == sub.subscribee.id
-            else:
-                criteria = and_(criteria, m.Post.user_id == sub.subscribee.id)
-        sub_posts = m.Post.query.filter(criteria).all() if criteria is not None else []
+            criteria = and_(criteria, m.Post.created_by_id == sub.subscribee.id)
+
+        # if criteria is still "true", then no filters 
+        # were applied, and no posts should be returned
+        if criteria == "true": 
+            criteria = "false"
+
+        sub_posts = m.Post.query.filter(criteria).all()
         posts |= set(sub_posts)
 
     postlist = list(posts)
