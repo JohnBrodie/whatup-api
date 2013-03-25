@@ -27,7 +27,7 @@ class WhenCreatingValidSubscription(_FunctionalTestCase):
 
     endpoint = '/subscriptions'
     expected_status = 201
-    post_data = {}
+    post_data = {"subscribee_id":2}
     new_id = 3
 
     def should_return_new_subscription_id(self):

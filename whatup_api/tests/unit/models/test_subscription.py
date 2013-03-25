@@ -44,8 +44,8 @@ class DescribeSubscriptionModel(SubscriptionModelTestCase):
     def should_have_tags_relation_to_tags_model(self):
         self.assertEquals(self.has_target('tags'), 'tags')
 
-    def should_have_tags_dynamically_loaded(self):
-        self.assertEquals(self.is_lazy('tags'), 'dynamic')
+    def should_have_tags_not_dynamically_loaded(self):
+        self.assertFalse(self.is_lazy('tags') == 'dynamic')
 
     def should_have_tags_secondary_table(self):
         self.assertEquals(self.has_secondary('tags'), 'substags')

@@ -1,4 +1,5 @@
 """Model for subscriptions"""
+from sqlalchemy import event
 from sqlalchemy.orm import validates
 from sqlalchemy.sql import func
 
@@ -24,7 +25,7 @@ class Subscription(db.Model):
     owner = db.relationship('User', primaryjoin="User.id==Subscription.user_id")
     subscribee_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     subscribee = db.relationship('User', primaryjoin="User.id==Subscription.subscribee_id")
-    tags = db.relationship("Tag", secondary=lambda: subsTags, lazy='dynamic')
+    tags = db.relationship("Tag", secondary=lambda: subsTags)
     is_deleted = db.Column(db.Boolean, default=False, nullable=False)
 
     @validates('user_id')
@@ -46,3 +47,10 @@ class Subscription(db.Model):
     @property
     def serialize_tags(self):
        return [ item.serialize for item in self.tags]
+
+def subscription_validator(subscription, connection, target):
+    if len(target.tags) == 0 and target.subscribee_id is None:
+        raise APIError({'Error': 'You must specify at least one tag or one user.'})
+
+event.listen(Subscription, 'before_insert', subscription_validator)
+event.listen(Subscription, 'before_update', subscription_validator)

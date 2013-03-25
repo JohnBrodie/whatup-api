@@ -18,3 +18,4 @@ class SubscriptionData(DataSet):
 
     class SpecifiesNone:
         owner = UserData.Default
+        tags = [TagData.Default]
