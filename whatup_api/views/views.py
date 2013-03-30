@@ -104,7 +104,7 @@ def subscriptions():
     return jsonify(response), 200
 
 def isValidPassword(password):
-    if not password: 
+    if not password:
         return False
     if len(password) < app.config['MIN_PASSWORD_LENGTH']:
         return False
@@ -157,9 +157,9 @@ def subscribed():
         if sub.subscribee is not None:
             criteria = and_(criteria, m.Post.created_by_id == sub.subscribee.id)
 
-        # if criteria is still "true", then no filters 
+        # if criteria is still "true", then no filters
         # were applied, and no posts should be returned
-        if criteria == "true": 
+        if criteria == "true":
             criteria = "false"
 
         sub_posts = m.Post.query.filter(criteria).all()

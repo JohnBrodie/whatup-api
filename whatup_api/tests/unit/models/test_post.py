@@ -57,7 +57,7 @@ class DescribePostModel(PostModelTestCase):
     def should_have_tags(self):
         tags = self.Default.tags.all()
         for tag in tags:
-            self.assertEqual(tag.author.id, self.user.id)
+            self.assertEqual(tag.creator.id, self.user_data.Default.id)
 
     def should_have_tags_relation_to_tags_model(self):
         self.assertEquals(self.has_target('tags'), 'tags')

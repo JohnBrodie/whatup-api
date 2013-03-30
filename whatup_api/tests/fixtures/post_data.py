@@ -2,6 +2,7 @@
 from datetime import datetime
 from fixture import DataSet
 
+from whatup_api.tests.fixtures.tag_data import TagData
 from whatup_api.tests.fixtures.user_data import UserData
 
 
@@ -15,6 +16,7 @@ class PostData(DataSet):
         topic = 'topic goes here'
         body = 'body goes here'
         is_deleted = False
+        tags = [TagData.Default, TagData.SpecifiesNone]
 
     class SpecifiesNone:
         body = 'Tortoise, plaid, and Swedish meatballs.'
