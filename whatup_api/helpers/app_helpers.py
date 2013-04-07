@@ -9,8 +9,10 @@ from urllib import unquote
 from os.path import basename
 from urlparse import urlsplit
 from ConfigParser import NoSectionError
-from flask import abort
+from flask import abort, current_app
+from flask.ext.login import current_user
 from flask.ext.restless import APIManager
+from functools import wraps
 from os import environ
 from flask.ext.login import current_user
 import datetime
@@ -23,6 +25,17 @@ from sqlalchemy.exc import (
 from whatup_api import prod_config
 from whatup_api import models as m
 from whatup_api.exceptions import APIError
+
+
+def admin_required(fn):
+
+    @wraps(fn)
+    def decorated_view(*args, **kwargs):
+        if not current_user.is_admin:
+            return current_app.login_manager.unauthorized()
+
+        return fn(*args, **kwargs)
+    return decorated_view
 
 
 def check_login():

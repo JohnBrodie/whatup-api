@@ -8,10 +8,11 @@ from sqlalchemy import and_
 from whatup_api.app import app
 from whatup_api import models as m
 from whatup_api.helpers.app_helpers import (
+    admin_required,
     check_login,
     create_attachment_from_url,
     create_attachment_from_file,
-    serialize_and_paginate
+    serialize_and_paginate,
 )
 
 from json import loads
@@ -112,6 +113,7 @@ def isValidPassword(password):
 
 @app.route('/users', methods=['POST'])
 @login_required
+@admin_required
 def users():
     data = loads(request.data)
     username = data.get("name", None)

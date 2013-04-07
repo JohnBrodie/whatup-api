@@ -15,6 +15,7 @@ class UserData(DataSet):
         is_deleted = False
         email = 'enigma@ayush.me'
         pw_hash = generate_password_hash('password')
+        is_admin = True
 
     class SpecifiesNone:
         name = 'John Doe'

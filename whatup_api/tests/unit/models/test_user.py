@@ -72,6 +72,15 @@ class DescribeUserModel(UserModelTestCase):
     def should_have_non_nullable_pw_hash(self):
         self.assertFalse(self.is_nullable('pw_hash'))
 
+    def should_have_is_admin(self):
+        self.assertEqual(self.Default.is_admin, self.user_data.Default.is_admin)
+
+    def should_have_is_admin_as_boolean(self):
+        self.assertTrue(self.is_type('is_admin', self.db.Boolean))
+
+    def should_have_non_nullable_is_admin(self):
+        self.assertFalse(self.is_nullable('is_admin'))
+
     def should_have_name_validation_return_name(self):
         name = 'name here'
         returned_name = m.User.validate_name(
@@ -85,4 +94,3 @@ class DescribeUserModel(UserModelTestCase):
 
         error = cm.exception.errors
         self.assertEqual(error['name'], 'Must specify name')
-

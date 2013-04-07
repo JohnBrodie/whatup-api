@@ -43,6 +43,17 @@ class WhenCreatingValidUser(_FunctionalTestCase):
         self.assertIsNotNone(new_user)
 
 
+class WhenCreatingUserWithoutAdmin(_FunctionalTestCase):
+
+    endpoint = '/users'
+    expected_status = 401
+    is_admin = False
+    post_data = {'name': 'name here', 'password': 'password'}
+
+    def should_return_login_url(self):
+        self.assertEqual(self.json['url'], '/login')
+
+
 class WhenCreatingNullUser(_FunctionalTestCase):
 
     endpoint = '/users'

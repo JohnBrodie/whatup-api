@@ -17,7 +17,11 @@ class _FunctionalTestCase(_BaseApiTestCase):
     @classmethod
     def setUpClass(cls):
         super(_FunctionalTestCase, cls).setUpClass()
-        cls.response = cls.get_response()
+        cls.response = ''
+        if hasattr(cls, 'is_admin'):
+            cls.response = cls.get_response(admin=cls.is_admin)
+        else:
+            cls.response = cls.get_response()
         cls.json = cls.response_to_json(cls.response)
 
     @classmethod
@@ -35,18 +39,25 @@ class _FunctionalTestCase(_BaseApiTestCase):
                 headers=[('Content-Type', 'multipart/form-data')])
 
     @classmethod
+    def non_admin_login(cls):
+        cls.client.post('/login', data={'username':'John Doe', 'password':'password'},
+                headers=[('Content-Type', 'multipart/form-data')])
+
+    @classmethod
     def logout(cls):
         cls.client.get('/logout')
 
     @classmethod
-    def get_response(cls, login=True):
+    def get_response(cls, login=True, admin=True):
         if not hasattr(cls, 'endpoint'):
             return
         response = ''
 
         with cls.client:
-            if login:
+            if login and admin:
                 cls.login()
+            if not admin:
+                cls.non_admin_login()
 
             if hasattr(cls, 'filename'):
                 if hasattr(cls, 'filepath'):

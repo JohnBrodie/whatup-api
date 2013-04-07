@@ -22,6 +22,7 @@ class User(db.Model, UserMixin):
     is_deleted = db.Column(db.Boolean, default=False, nullable=False)
     is_activated = db.Column(db.Boolean, default=True, nullable=False)
     pw_hash = db.Column(db.String(80), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
     @validates('name')
     def validate_name(self, key, name):
