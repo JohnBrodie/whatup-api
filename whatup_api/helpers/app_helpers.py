@@ -99,6 +99,14 @@ def add_user_to_post(post_data):
     return post_data
 
 
+def remove_is_admin(put_data, instid):
+    """Remove is_admin so it can't be edited."""
+    if 'is_admin' in put_data:
+        del put_data['is_admin']
+
+    return put_data
+
+
 def handle_revision_updates(put_data, instid):
     """ If a post is being modified, save the
     original content of the post
@@ -196,6 +204,7 @@ def create_api(app):
         authentication_required_for=['GET', 'PATCH', 'PUT', 'DELETE'],
         authentication_function=check_login,
         validation_exceptions=validation_exceptions,
+        put_form_preprocessor=remove_is_admin,
         url_prefix=PREFIX,
     )
     manager.create_api(

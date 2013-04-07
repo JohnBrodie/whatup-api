@@ -95,6 +95,17 @@ class WhenEditingUsers(_FunctionalTestCase):
         self.assertEqual(self.put_data['bio'], self.json['bio'])
 
 
+class WhenEditingUserWithoutAdmin(_FunctionalTestCase):
+
+    endpoint = '/users/2'
+    expected_status = 200
+    put_data = {'is_admin': True}
+    is_admin = False
+
+    def should_not_change_is_admin_status(self):
+        self.assertEqual(self.json['is_admin'], False)
+
+
 class WhenEditingUserWithInvalidID(_FunctionalTestCase):
 
     endpoint = '/users/999'
