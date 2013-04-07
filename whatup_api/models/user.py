@@ -7,6 +7,7 @@ from whatup_api.models import db
 from flask_login import UserMixin
 from flaskext.bcrypt import generate_password_hash, check_password_hash
 
+
 class User(db.Model, UserMixin):
     """User model"""
 
@@ -32,14 +33,13 @@ class User(db.Model, UserMixin):
 
     @property
     def serialize(self):
-       return {
-            'id'    : self.id,
-            'name'  : self.name,
-            'email' : self.email,
-            'alias' : self.alias,
-            'bio'   : self.bio
-       }
-
+        return {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+            'alias': self.alias,
+            'bio': self.bio
+        }
 
     def is_active(self):
         return self.is_activated

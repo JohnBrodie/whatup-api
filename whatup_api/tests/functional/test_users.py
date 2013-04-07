@@ -60,11 +60,13 @@ class WhenCreatingNullUser(_FunctionalTestCase):
     expected_status = 400
     post_data = {'name': None}
 
+
 class WhenNewPasswordHasTooFewCharacters(_FunctionalTestCase):
 
     endpoint = '/users'
     expected_status = 400
     post_data = {'name': 'username', 'password': 'p'}
+
 
 class WhenDeletingUsers(_FunctionalTestCase):
 

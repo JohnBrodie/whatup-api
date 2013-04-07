@@ -4,10 +4,6 @@ from mock import Mock, patch
 
 from whatup_api.tests import _BaseApiTestCase
 
-from flask.ext.login import login_user, logout_user
-
-from whatup_api import models as m
-
 
 class _FunctionalTestCase(_BaseApiTestCase):
 
@@ -35,13 +31,18 @@ class _FunctionalTestCase(_BaseApiTestCase):
 
     @classmethod
     def login(cls):
-        cls.client.post('/login', data={'username':'Ayush Sobti', 'password':'password'},
-                headers=[('Content-Type', 'multipart/form-data')])
+        cls.client.post(
+            '/login',
+            data={'username': 'Ayush Sobti', 'password': 'password'},
+            headers=[('Content-Type', 'multipart/form-data')]
+        )
 
     @classmethod
     def non_admin_login(cls):
-        cls.client.post('/login', data={'username':'John Doe', 'password':'password'},
-                headers=[('Content-Type', 'multipart/form-data')])
+        cls.client.post(
+            '/login', data={'username': 'John Doe', 'password': 'password'},
+            headers=[('Content-Type', 'multipart/form-data')]
+        )
 
     @classmethod
     def logout(cls):

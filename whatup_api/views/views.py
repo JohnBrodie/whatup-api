@@ -1,6 +1,6 @@
 import os
 
-from flask import request, abort, jsonify, redirect, g
+from flask import request, abort, jsonify, redirect
 from sqlalchemy.exc import IntegrityError
 from flask.ext.login import login_required, current_user
 from sqlalchemy import and_
@@ -54,6 +54,7 @@ def delete_attachment(attachment_id):
         abort(400)
     return jsonify(status='File deleted'), 200
 
+
 @app.route('/upload', methods=['POST'])
 @login_required
 def upload():
@@ -95,14 +96,21 @@ def upload():
     )
     return response
 
+
 @app.route('/subscriptions', methods=['GET'])
 @login_required
 def subscriptions():
     user_id = current_user.id
     page = int(request.args.get('page', 1))
-    user_subs = m.Subscription.query.filter(and_(m.Subscription.user_id==user_id, m.Subscription.is_deleted == False)).all()
+    user_subs = m.Subscription.query.filter(
+        and_(
+            m.Subscription.user_id == user_id,
+            m.Subscription.is_deleted == False
+        )
+    ).all()
     response = serialize_and_paginate(user_subs, app.config['PAGE_LENGTH'], page)
     return jsonify(response), 200
+
 
 def isValidPassword(password):
     if not password:
@@ -110,6 +118,7 @@ def isValidPassword(password):
     if len(password) < app.config['MIN_PASSWORD_LENGTH']:
         return False
     return True
+
 
 @app.route('/users', methods=['POST'])
 @login_required
@@ -142,6 +151,7 @@ def users():
     )
     return response, 201
 
+
 @app.route('/subscribed', methods=['GET'])
 @login_required
 def subscribed():
@@ -151,7 +161,12 @@ def subscribed():
     posts = set()
 
     user_id = current_user.id
-    user_subs = m.Subscription.query.filter(and_(m.Subscription.user_id==user_id, m.Subscription.is_deleted == False)).all()
+    user_subs = m.Subscription.query.filter(
+        and_(
+            m.Subscription.user_id == user_id,
+            m.Subscription.is_deleted == False
+        )
+    ).all()
     for sub in user_subs:
         criteria = "true"
         for tag in sub.tags:
@@ -170,6 +185,7 @@ def subscribed():
     postlist = list(posts)
     response = serialize_and_paginate(postlist, page_length, page)
     return jsonify(response), 200
+
 
 @app.route('/posts/<post_id>/revisions', methods=['GET'])
 @login_required

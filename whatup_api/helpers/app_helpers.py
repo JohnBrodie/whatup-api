@@ -14,7 +14,6 @@ from flask.ext.login import current_user
 from flask.ext.restless import APIManager
 from functools import wraps
 from os import environ
-from flask.ext.login import current_user
 import datetime
 from sqlalchemy.exc import (
     ArgumentError, IntegrityError,
@@ -28,7 +27,11 @@ from whatup_api.exceptions import APIError
 
 
 def admin_required(fn):
+    """Check if user is admin.
 
+    If they are not an admin, return 401 UNAUTHORIZED.
+
+    """
     @wraps(fn)
     def decorated_view(*args, **kwargs):
         if not current_user.is_admin:
@@ -85,6 +88,7 @@ def add_user_to_request(post_data):
     post_data['user_id'] = current_user.id
     return post_data
 
+
 def add_user_to_post(post_data):
     """ Add the current user to post data
     before passing the request on to the model.
@@ -93,6 +97,7 @@ def add_user_to_post(post_data):
     post_data['created_by_id'] = current_user.id
     post_data['last_modified_by_id'] = current_user.id
     return post_data
+
 
 def handle_revision_updates(put_data, instid):
     """ If a post is being modified, save the
@@ -124,13 +129,14 @@ def handle_revision_updates(put_data, instid):
         for tag in rev.tags:
             put_data['tags'].append({'id': tag.id})
 
-    revision = m.Revision(user_id=post.last_modified_by_id,
-                          post_id=post.id,
-                          topic=post.topic,
-                          body=post.body,
-                          created_at=post.modified_at,
-                          modified_at=post.modified_at,
-                         )
+    revision = m.Revision(
+        user_id=post.last_modified_by_id,
+        post_id=post.id,
+        topic=post.topic,
+        body=post.body,
+        created_at=post.modified_at,
+        modified_at=post.modified_at,
+    )
 
     for tag in post.tags:
         revision.tags.append(tag)
@@ -284,13 +290,14 @@ def create_attachment_from_url(url, config):
         location=filename,
     )
 
+
 def serialize_and_paginate(objlist, page_length, page):
     objlist = [obj for obj in objlist if not obj.is_deleted]
     response = {}
     objlist.sort(key=lambda x: x.created_at, reverse=True)
-    response['total_pages'] = int(ceil(len(objlist)/float(page_length)))
+    response['total_pages'] = int(ceil(len(objlist) / float(page_length)))
     response['num_results'] = len(objlist)
-    objlist = objlist[page_length*(page-1):page_length*(page)]
+    objlist = objlist[page_length * (page - 1): page_length * (page)]
     response['page'] = page
     response['objects'] = [i.serialize for i in objlist]
     return response
