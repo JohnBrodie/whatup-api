@@ -1,4 +1,4 @@
-"""users endpoint test"""
+
 import whatup_api.models as m
 from whatup_api.tests.functional import _FunctionalTestCase, _NotFoundTestCase
 
@@ -31,7 +31,7 @@ class WhenCreatingValidUser(_FunctionalTestCase):
 
     endpoint = '/users'
     expected_status = 201
-    post_data = {'name': 'name here', 'password': 'password'}
+    post_data = {'alias': 'name here', 'password': 'password'}
     new_id = 3
 
     def should_return_new_user_id(self):
@@ -48,7 +48,7 @@ class WhenCreatingUserWithoutAdmin(_FunctionalTestCase):
     endpoint = '/users'
     expected_status = 401
     is_admin = False
-    post_data = {'name': 'name here', 'password': 'password'}
+    post_data = {'alias': 'name here', 'password': 'password'}
 
     def should_return_login_url(self):
         self.assertEqual(self.json['url'], '/login')
@@ -58,14 +58,14 @@ class WhenCreatingNullUser(_FunctionalTestCase):
 
     endpoint = '/users'
     expected_status = 400
-    post_data = {'name': None}
+    post_data = {'alias': None}
 
 
 class WhenNewPasswordHasTooFewCharacters(_FunctionalTestCase):
 
     endpoint = '/users'
     expected_status = 400
-    post_data = {'name': 'username', 'password': 'p'}
+    post_data = {'alias': 'username', 'password': 'p'}
 
 
 class WhenDeletingUsers(_FunctionalTestCase):

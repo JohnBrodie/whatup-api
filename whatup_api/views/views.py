@@ -125,7 +125,7 @@ def isValidPassword(password):
 @admin_required
 def users():
     data = loads(request.data)
-    username = data.get("name", None)
+    username = data.get("alias", None)
     password = data.get("password", None)
     if username is None:
         return jsonify(error='Invalid username'), 400
