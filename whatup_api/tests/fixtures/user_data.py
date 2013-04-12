@@ -19,4 +19,5 @@ class UserData(DataSet):
 
     class SpecifiesNone:
         name = 'John Doe'
+        alias = 'jdoe'
         pw_hash = generate_password_hash('password')

@@ -33,14 +33,14 @@ class _FunctionalTestCase(_BaseApiTestCase):
     def login(cls):
         cls.client.post(
             '/login',
-            data={'username': 'Ayush Sobti', 'password': 'password'},
+            data={'username': 'xbonez', 'password': 'password'},
             headers=[('Content-Type', 'multipart/form-data')]
         )
 
     @classmethod
     def non_admin_login(cls):
         cls.client.post(
-            '/login', data={'username': 'John Doe', 'password': 'password'},
+            '/login', data={'username': 'jdoe', 'password': 'password'},
             headers=[('Content-Type', 'multipart/form-data')]
         )
 

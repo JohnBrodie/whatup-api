@@ -14,7 +14,7 @@ def login():
     if request.method == "POST" and "username" in request.form and "password" in request.form:
         username = request.form["username"]
         password = request.form["password"]
-        user = m.User.query.filter(m.User.name == username).first()
+        user = m.User.query.filter(m.User.alias == username).first()
         if user is None:
             return jsonify(error='Invalid username.'), 400
         if not user.check_password(password):

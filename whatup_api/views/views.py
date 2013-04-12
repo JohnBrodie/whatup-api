@@ -129,14 +129,14 @@ def users():
     password = data.get("password", None)
     if username is None:
         return jsonify(error='Invalid username'), 400
-    numUsers = m.User.query.filter(m.User.name == username).count()
+    numUsers = m.User.query.filter(m.User.alias == username).count()
     if numUsers != 0:
         return jsonify(error='Username taken'), 400
     if password is None:
         return jsonify(error='No password provided'), 400
     if not isValidPassword(password):
         return jsonify(error='Invalid password'), 400
-    user = m.User(name=username)
+    user = m.User(alias=username)
     user.set_password(password)
     m.db.session.add(user)
     try:
@@ -147,7 +147,7 @@ def users():
         id=user.id,
         created_at=str(user.created_at),
         modified_at=str(user.modified_at),
-        name=user.name,
+        alias=user.alias,
     )
     return response, 201
 

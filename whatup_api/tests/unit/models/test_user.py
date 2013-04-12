@@ -21,8 +21,8 @@ class DescribeUserModel(UserModelTestCase):
     def should_have_name_with_length(self):
         self.assertEquals(self.get_length('name'), 255)
 
-    def should_have_non_nullable_name(self):
-        self.assertFalse(self.is_nullable('name'))
+    def should_have_nullable_name(self):
+        self.assertTrue(self.is_nullable('name'))
 
     def should_have_alias(self):
         self.assertEquals(self.Default.alias, self.user_data.Default.alias)
@@ -33,8 +33,8 @@ class DescribeUserModel(UserModelTestCase):
     def should_have_alias_with_length(self):
         self.assertEquals(self.get_length('alias'), 255)
 
-    def should_have_nullable_alias(self):
-        self.assertEquals(self.SpecifiesNone.alias, None)
+    def should_have_non_nullable_alias(self):
+        self.assertFalse(self.is_nullable('alias'))
 
     def should_have_bio(self):
         self.assertEquals(self.Default.bio, self.user_data.Default.bio)
