@@ -103,7 +103,19 @@ def remove_is_admin(put_data, instid):
     """Remove is_admin so it can't be edited."""
     if 'is_admin' in put_data:
         del put_data['is_admin']
+    return put_data
 
+def user_put_preprocessor(put_data, instid):
+    put_data = remove_is_admin(put_data, instid)
+    if 'password' in put_data:
+        password = put_data['password']
+        del put_data['password']
+        if int(instid) == int(current_user.id) or current_user.is_admin:
+            user = m.User.query.get(instid)
+            if user is not None:
+                user.set_password(password)
+        else:
+            abort(500)
     return put_data
 
 
@@ -204,7 +216,7 @@ def create_api(app):
         authentication_required_for=['GET', 'PATCH', 'PUT', 'DELETE'],
         authentication_function=check_login,
         validation_exceptions=validation_exceptions,
-        put_form_preprocessor=remove_is_admin,
+        put_form_preprocessor=user_put_preprocessor,
         url_prefix=PREFIX,
     )
     manager.create_api(

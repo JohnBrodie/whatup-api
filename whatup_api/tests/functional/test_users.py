@@ -53,6 +53,31 @@ class WhenCreatingUserWithoutAdmin(_FunctionalTestCase):
     def should_return_login_url(self):
         self.assertEqual(self.json['url'], '/login')
 
+class WhenChangingOtherUserPasswordWithoutAdmin(_FunctionalTestCase):
+    endpoint = '/users/1'
+    expected_status = 400
+    is_admin = False
+    put_data = {'password': 'password'}
+
+class WhenChangingOtherUserPasswordWithAdmin(_FunctionalTestCase):
+    endpoint = '/users/2'
+    expected_status = 200
+    is_admin = True
+    put_data = {'password': 'password'}
+
+class WhenChangingOwnPasswordWithoutAdmin(_FunctionalTestCase):
+    endpoint = '/users/2'
+    expected_status = 200
+    is_admin = False
+    put_data = {'password': 'password'}
+
+class WhenChangingOwnPasswordWithAdmin(_FunctionalTestCase):
+    endpoint = '/users/1'
+    expected_status = 200
+    is_admin = True
+    put_data = {'password': 'password'}
+
+
 
 class WhenCreatingNullUser(_FunctionalTestCase):
 
