@@ -20,7 +20,7 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     modified_at = db.Column(db.DateTime, default=func.now(), nullable=False)
     topic = db.Column(db.String(1000), default='Untitled', nullable=False)
-    body = db.Column(db.String(1000), nullable=False)
+    body = db.Column(db.String(10000), nullable=False)
 
     created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_by = db.relationship('User', primaryjoin="User.id==Post.created_by_id")

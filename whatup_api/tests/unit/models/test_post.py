@@ -29,7 +29,7 @@ class DescribePostModel(PostModelTestCase):
         self.assertTrue(self.is_type('body', self.db.String))
 
     def should_have_body_with_length(self):
-        self.assertEquals(self.get_length('body'), 1000)
+        self.assertEquals(self.get_length('body'), 10000)
 
     def should_have_non_nullable_body(self):
         self.assertFalse(self.is_nullable('body'))
