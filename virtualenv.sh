@@ -22,3 +22,4 @@ else # Staging
         touch /var/www/s-api/whatup_api_staging.wsgi  # Tell apache to reload app
     fi
 fi
+echo "You can now develop WhatUp locally"
