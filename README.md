@@ -3,6 +3,14 @@ whatup-api
 
 Project WhatUp Core API
 
+This is the backend API for _Project WhatUp_, a 2013 Drexel Computer Science Senior Design runner-up.
+_Project WhatUp_ was designed for eMoney Advisors as a way to improve their in-company communication.
+THe API primarily uses: FLask, SQLAlchemy, and Flask-Restless.  Apache was used as the WSGI server,
+and MySQL for the database.  Jenkins took care of continuous integration.
+
+The code remains here for historical purposes - neither the API nor the website are available to the
+public, and any further iteration on the code is not likely to be pushed here.
+
 Developing
 ==========
 
